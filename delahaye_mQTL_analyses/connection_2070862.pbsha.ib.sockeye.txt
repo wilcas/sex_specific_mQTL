@@ -1,0 +1,19 @@
+ 
+1. Create an SSH tunnel to RStudio Server from your local workstation using the following command:
+ 
+ssh -N -L 8787:se009:54554 wcasazza@sockeye.arc.ubc.ca
+ 
+2. Point your web browser to http://localhost:8787
+ 
+3. Login to RStudio Server using the following credentials:
+ 
+Username: wcasazza
+Password: +XV20Ig+bsa135inPi1Q
+ 
+When done using RStudio Server, terminate the job by:
+ 
+1. Sign out of RStudio (Left of the "power" button in the top right corner of the RStudio window)
+2. Issue the following command on the login node:
+ 
+qdel 2070862.pbsha.ib.sockeye
+ 

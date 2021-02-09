@@ -1,3 +1,5 @@
+# PBS/torque script generated files
+*connection.*.txt
 # History files
 .Rhistory
 .Rapp.history
