@@ -1,0 +1,20 @@
+#!/bin/bash
+ 
+#PBS -l walltime=03:00:00,select=1:ncpus=16:mem=120gb
+#PBS -N robust_reg
+#PBS -A st-dennisjk-1
+#PBS -m abe
+#PBS -M willcasazza@gmail.com
+#PBS -J 1-10
+#PBS -o output_^array_index^.txt
+#PBS -e error_^array_index^.txt
+################################################################################
+   
+# Change directory into the job dir
+cd /scratch/st-dennisjk-1/wcasazza/delahaye_QC
+    
+# Load software environment
+module load r
+     
+Rscript robust_regression.R $PBS_ARRAY_INDEX
+

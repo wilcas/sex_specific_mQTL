@@ -1,0 +1,121 @@
+---
+title: "Delahaye Post mQTL analyses"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(data.table)
+library(tidyverse)
+library(qvalue)
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+opt_pc <- fread("matrix_eqtl_data/cis_mQTL_9_methy_PC_all.txt",key="SNP")
+delahaye <- fread("delahaye_2020_mQTL.csv")
+hist(opt_pc$`p-value`,breaks = 100)
+sig_delahaye <- opt_pc[FDR < 0.05]
+```
+## Replication
+Delahaye and itself:
+```{r}
+delahaye_repeat_merged <- merge(opt_pc,delahaye,by.x = c("SNP","gene"), by.y = c("SNPID","cpgID"))
+1 - pi0est(delahaye_repeat_merged$`p-value`)$pi0
+```
+
+Robinson and Delahaye
+```{r}
+robinson_mqtl <- fread("../robinson_results/cis_impute_mQTL_results_6_methy_PC.txt")
+```
+
+```{r}
+robinson_matched <- merge(robinson_mqtl,sig_delahaye,by=c("SNP","gene"))
+1 - pi0est(robinson_matched$`p-value.x`,m=nrow(robinson_matched))$pi0
+```
+delahaye and robinson:
+```{r}
+robinson_sig <- robinson_mqtl[FDR < 0.05]
+delahaye_matched <- merge(opt_pc,robinson_sig, by=c("SNP","gene"))
+1 - pi0est(delahaye_matched$`p-value.x`,m=nrow(delahaye_matched))$pi0
+```
+
+Delahaye and RICHS
+```{r}
+richs_mqtl <- fread("../RICHS_QC/matrix_eqtl_data/cis_mQTL_9_methy_PC_all.txt")
+```
+```{r}
+
+richs_matched <- merge(richs_mqtl,sig_delahaye,by=c("SNP","gene"))
+1 - pi0est(richs_matched$`p-value.x`,m=nrow(richs_matched))$pi0
+```
+
+
+
+## Sex specific mQTL
+```{r}
+sex_spec <- fread("matrix_eqtl_data/cis_mQTL_9_methy_PC_all_sex_interaction.txt")
+sig_sex <- sex_spec[FDR < 0.05]
+```
+```{r}
+robinson_sex <- rbind(
+  fread("../robinson_results/cis_int_sex_impute_mQTL_results_6_methy_PC.txt"),
+  fread("../robinson_results/cis_pre_impute_mQTL_results_6_methy_PC_sex_interaction_chrX.txt")
+)
+```
+
+```{r}
+robinson_matched <- merge(robinson_sex,sig_sex,by=c("SNP","gene"))
+1 - pi0est(robinson_matched$`p-value.x`,m=nrow(robinson_matched))$pi0
+robinson_matched[FDR.x < 0.05]
+ggplot(robinson_matched, aes(-log10(`p-value.x`),-log10(`p-value.y`))) + geom_point() + labs(x="Robinson Interaction", y= "Delahaye Interaction")
+```
+delahaye and robinson:
+```{r}
+robinson_sig <- robinson_sex[FDR < 0.05]
+delahaye_matched <- merge(sex_spec,robinson_sig, by=c("SNP","gene"))
+1 - qvalue::pi0est(delahaye_matched$`p-value.x`,m=nrow(delahaye_matched))$pi0
+delahaye_matched[FDR.x < 0.05]
+ggplot(delahaye_matched, aes(-log10(`p-value.x`),-log10(`p-value.y`))) + geom_point() + labs(x="Delahaye Interaction", y = "Robinson Interaction") + coord_flip()
+
+```
+
+Delahaye and RICHS
+```{r}
+richs_sex <- fread("../RICHS_QC/matrix_eqtl_data/cis_mQTL_9_methy_PC_all_sex_interaction.txt")
+```
+```{r}
+richs_matched <- merge(richs_sex,sig_sex,by=c("SNP","gene"))
+1 - qvalue::pi0est(richs_matched$`p-value.x`)$pi0
+richs_matched[FDR.x < 0.05]
+fwrite(richs_matched[FDR.x < 0.05],"richs_delahaye_matched_sbmqtl_fdr_05.txt",quote=F)
+```
+```{r}
+richs_sig <- richs_sex[FDR < 0.05]
+delahaye_matched <- merge(sex_spec,richs_sig, by=c("SNP","gene"))
+1 - qvalue::pi0est(delahaye_matched$`p-value.x`,m=nrow(delahaye_matched))$pi0
+delahaye_matched[FDR.x < 0.05]
+ggplot(delahaye_matched, aes(-log10(`p-value.x`),-log10(`p-value.y`))) + geom_point() + labs(x="Delahaye Interaction", y = "RICHS Interaction") + coord_flip()
+```
+
+## TESTING 
+Checking if these mQTLs include too many low-frequency snps:
+```{r}
+maf_table <- fread("placenta_regulatory_landscape/RootStudyConsentSet_phs001717.PlacentalRegulation.v1.p1.c1.HMB-IRB-PUB-COL-MDS/genotype_qc/all_imputed_r2_30_rsid.afreq")
+common_SNP <- maf_table[ALT_FREQS >= 0.01 & ALT_FREQS <= 0.99]$ID
+hits_common <- na.omit(sig_delahaye[common_SNP,on="SNP"])
+``` 
+
+```{r}
+common_snp_rich <- fread("../RICHS_genotyping/phg001102.v1.RICHS.genotype-calls-matrixfmt.MEGA_Consortium.c1.GRU/all_imputed_r2_30_rsid.afreq")[ALT_FREQS >= 0.01 & ALT_FREQS <= 0.99]$ID
+nrow(richs_mqtl[SNP %chin% common_snp_rich & FDR < 0.05])
+nrow(richs_mqtl[SNP %chin% common_snp_rich &`p-value`< (0.05/nrow(richs_mqtl))])
+length(unique(richs_mqtl[SNP %chin% common_snp_rich & FDR < 0.05]$gene))
+length(unique(richs_mqtl[SNP %chin% common_snp_rich &`p-value`< (0.05/nrow(richs_mqtl))]$gene))
+```
+
+```{r}
+nrow(robinson_mqtl[FDR < 0.05])
+nrow(robinson_mqtl[`p-value` < (0.05 / nrow(robinson_mqtl))])
+length(unique(robinson_mqtl[FDR < 0.05]$gene))
+length(unique(robinson_mqtl[`p-value` < (0.05 / nrow(robinson_mqtl))]$gene))
+```
+
