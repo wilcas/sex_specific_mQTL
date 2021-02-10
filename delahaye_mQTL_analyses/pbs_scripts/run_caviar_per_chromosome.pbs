@@ -1,5 +1,5 @@
 #!/bin/bash
- 
+
 #PBS -l walltime=03:00:00,select=1:ncpus=16:mem=60gb
 #PBS -N caviar
 #PBS -A st-dennisjk-1
@@ -18,42 +18,38 @@ module load parallel
 module load singularity
 export SINGULARITYENV_LD_LIBRARY_PATH="/usr/local/lib/R/lib:/usr/local/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/java-11-openjdk-amd64/lib/server:/arc/software/spack/opt/spack/linux-centos7-x86_64/gcc-4.8.5/gcc-5.4.0-mufy3fjs33jgj47lb3346bqktgtjnt4i/lib64:/arc/software/spack/opt/spack/linux-centos7-x86_64/gcc-4.8.5/gcc-5.4.0-mufy3fjs33jgj47lb3346bqktgtjnt4i/lib:/cm/shared/apps/pbspro-ce/19.1.3/lib:/.singularity.d/libs":$LD_LIBRARY_PATH
 
-
 # Set global variables
 PLINK="/arc/project/st-dennisjk-1/software/plink1.9/plink"
 CAVIAR="/arc/project/st-dennisjk-1/software/caviar/CAVIAR-C++/CAVIAR"
 
-if [[ "$PBS_ARRAY_INDEX" -eq 23 ]]; then
-  CHR="X"
+if [[ $PBS_ARRAY_INDEX -eq 23 ]]; then
+	CHR="X"
 else
-  CHR="$PBS_ARRAY_INDEX"
+	CHR="$PBS_ARRAY_INDEX"
 fi
 
 run_caviar() {
-  f="$1"
-  if [[ ! -f ${f%.*}.out_post ]]; then
+	f="$1"
+	if [[ ! -f ${f%.*}.out_post ]]; then
 
-    $PLINK --bfile /arc/project/st-dennisjk-1/shared/data/1000G_phase3_by_chr/plink/chr${CHR}\
-      --extract ${f}\
-      --r square\
-      --out ${f%.*}
+		$PLINK --bfile /arc/project/st-dennisjk-1/shared/data/1000G_phase3_by_chr/plink/chr${CHR} \
+			--extract ${f} \
+			--r square --out ${f%.*}
 
-    $CAVIAR -o ${f%.*}.out \
-      -l ${f%.*}.ld \
-      -z ${f} \
-      -r 0.95 \
-      -c 2\
-      -f 0 
-    rm ${f%.*}.{ld,out_set,log,out.log,nosex}
-    rm ${f}
-  fi
+		$CAVIAR -o ${f%.*}.out \
+			-l ${f%.*}.ld \
+			-z ${f} \
+			-r 0.95 \
+			-c 2 -f 0
+		rm ${f%.*}.{ld,out_set,log,out.log,nosex}
+		rm ${f}
+	fi
 }
-
 
 cd /scratch/st-dennisjk-1/wcasazza/delahaye_QC/
 
 # Execute the rserver within the rocker/rstudio container
-singularity exec --bind $TMPDIR:/var/run --home /scratch/st-dennisjk-1/wcasazza/ /arc/project/st-dennisjk-1/software/rstudio/rstudio.sif Rscript  prep_caviar_z.R ${CHR} ${MQTLS} ${Z_DIR} 
+singularity exec --bind $TMPDIR:/var/run --home /scratch/st-dennisjk-1/wcasazza/ /arc/project/st-dennisjk-1/software/rstudio/rstudio.sif Rscript prep_caviar_z.R ${CHR} ${MQTLS} ${Z_DIR}
 
 export -f run_caviar
 export PLINK

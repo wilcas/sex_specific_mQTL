@@ -26,9 +26,9 @@ out <- mclapply(
     fwrite(
       merge(a1, a2, by = c("CHR", "BP", "SNP", "CM")),
       sprintf("merged%s%s.%d.annot.gz", suffix1, suffix2, i),
-      row.names=F,
-      sep="\t",
-      quote=F
+      row.names = F,
+      sep = "\t",
+      quote = F
     )
   },
   mc.cores = 8

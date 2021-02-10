@@ -7,12 +7,11 @@
 #PBS -M willcasazza@gmail.com
 cd /scratch/st-dennisjk-1/wcasazza/delahaye_QC/
 module load singularity
-singularity exec /arc/project/st-dennisjk-1/software/rstudio/rstudio.sif\
-  Rscript run_cis_mqtl_75k.R --data_dir="matrix_eqtl_data/" \
-    --SNP_fname="all_imputed_matrixeQTL.txt"\
-    --cov_file="mQTL_covar_9_methy_PC.txt"\
-    --cis_outfile="${outfile}"\
-    --snp_pos="snp_pos.txt"\
-    --methylation_fname="methylation_matrixeQTL.txt"\
-    --probe_pos="probe_pos.txt"\
-    --model="${model}"
+singularity exec /arc/project/st-dennisjk-1/software/rstudio/rstudio.sif Rscript run_cis_mqtl_75k.R --data_dir="matrix_eqtl_data/" \
+	--SNP_fname="all_imputed_matrixeQTL.txt" \
+	--cov_file="mQTL_covar_9_methy_PC.txt" \
+	--cis_outfile="${outfile}" \
+	--snp_pos="snp_pos.txt" \
+	--methylation_fname="methylation_matrixeQTL.txt" \
+	--probe_pos="probe_pos.txt" \
+	--model="${model}"

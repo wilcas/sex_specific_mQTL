@@ -16,11 +16,10 @@ CHR=${PBS_ARRAY_INDEX}
 mkdir baseline_annot_files/chr${CHR}
 
 make_annot() {
-  f=${1}
-  name=$(basename ${f})
-  /arc/project/st-dennisjk-1/software/ldsc/make_annot.py --bed-file $f\
-    --bimfile /arc/project/st-dennisjk-1/shared/data/1000G_phase3_by_chr/plink/mapped_maf05_chr${CHR}.bim \
-    --annot-file baseline_annot_files/chr${CHR}/${name%.*}.annot
+	f=${1}
+	name=$(basename ${f})
+	/arc/project/st-dennisjk-1/software/ldsc/make_annot.py --bed-file $f --bimfile /arc/project/st-dennisjk-1/shared/data/1000G_phase3_by_chr/plink/mapped_maf05_chr${CHR}.bim \
+		--annot-file baseline_annot_files/chr${CHR}/${name%.*}.annot
 }
 export CHR
 export -f make_annot

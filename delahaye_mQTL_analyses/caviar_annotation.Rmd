@@ -24,16 +24,16 @@ all_mQTLs <- fread("matrix_eqtl_data/cis_mQTL_9_methy_PC_all.txt")
 ### SNP Sets and Z scores
 ```{r}
 probe_pos <- fread("matrix_eqtl_data/probe_pos.txt")
-kg_snps <- fread("/arc/project/st-dennisjk-1/shared/data/1000G_phase3_info/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz",skip="#CHROM",drop=c("QUAL","FILTER","INFO"))
+kg_snps <- fread("/arc/project/st-dennisjk-1/shared/data/1000G_phase3_info/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz", skip = "#CHROM", drop = c("QUAL", "FILTER", "INFO"))
 mQTL_in_1kg <- all_mQTLs[SNP %chin% kg_snps[`#CHROM` == "22"]$ID]
-for(cpg in unique(mQTL_in_1kg$gene)[1:10]){
+for (cpg in unique(mQTL_in_1kg$gene)[1:10]) {
   chr <- probe_pos[geneid == cpg]$chr
   fwrite(
-    mQTL_in_1kg[gene == cpg,.(SNP,Z =`t-stat`)],
-    sprintf("caviar_files/%s/%s.z",chr,cpg),
-    sep="\t",
-    col.names=FALSE,
-    quote=FALSE
+    mQTL_in_1kg[gene == cpg, .(SNP, Z = `t-stat`)],
+    sprintf("caviar_files/%s/%s.z", chr, cpg),
+    sep = "\t",
+    col.names = FALSE,
+    quote = FALSE
   )
 }
 ```
