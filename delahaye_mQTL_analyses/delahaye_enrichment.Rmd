@@ -7,6 +7,7 @@ output: html_document
 library(tidyverse)
 library(data.table)
 library(qqman)
+knitr::opts_knit$set(root.dir = "/scratch/st-dennisjk-1/wcasazza/delahaye_QC/")
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -199,6 +200,27 @@ test_plots("1")
 ```{r}
 test_plots("7")
 ```
+
+## Partitioned heritability analysis with LDSC
+```{r}
+cis_marginal_heritability <- function(f){
+  trait <- gsub(".*merged_(.*).results","\\1",f)
+  res <- fread(f)[grepl("marginal",Category)]
+  res$trait <- trait
+  return(res)
+}
+ldsc_results_marginal <- rbindlist(lapply(dir("ldsc_results",pattern=".*.results",full.names = TRUE),cis_marginal_heritability))
+
+ggplot(ldsc_results_marginal,aes(trait,Enrichment, fill=Category,ymin = Enrichment - Enrichment_std_error, ymax=Enrichment + Enrichment_std_error)) + geom_bar(stat='identity',position="dodge") + geom_errorbar(position="dodge") 
+
+ggplot(ldsc_results_marginal[grepl("SCZ|AD_j|adhd",trait) & !grepl("maxCPP",Category)],aes(trait,Enrichment, fill=Category,ymin = Enrichment - Enrichment_std_error, ymax=Enrichment + Enrichment_std_error)) + geom_bar(stat='identity',position="dodge") + geom_errorbar(position="dodge") 
+
+ggplot(ldsc_results_marginal[grepl("SCZ|AD_j|adhd",trait) & !grepl("maxCPP",Category)],aes(trait,Coefficient, fill=Category,ymin = Coefficient - Coefficient_std_error, ymax=Coefficient + Coefficient_std_error)) + geom_bar(stat='identity',position="dodge") + geom_errorbar(position="dodge") 
+
+ggplot(ldsc_results_marginal[grepl("SCZ|AD_j|adhd",trait) & !grepl("maxCPP",Category)],aes(trait,Prop._h2, fill=Category,ymin = Prop._h2 - Prop._h2_std_error, ymax=Prop._h2 + Prop._h2_std_error)) + geom_bar(stat='identity',position="dodge") + geom_errorbar(position="dodge") 
+
+```
+
 
 ## COLOC analysis
 Things to try:
