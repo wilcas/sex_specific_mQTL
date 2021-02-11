@@ -8,11 +8,17 @@
 source /home/wcasazza/miniconda3/bin/activate
 conda activate ldsc
 module load parallel
+
+# @todo create annotation files for each mQTL annotation and integrate
+# @body can use baseline model plus my annotation if it matches and there's a comma separating this file and the baseline in the `--ref-ld-chr` command
 ldsc() {
 	/arc/project/st-dennisjk-1/software/ldsc/ldsc.py --h2 /scratch/st-dennisjk-1/wcasazza/tmp_GWAS/formatted_sumstats/${1}.sumstats.gz \
-		--ref-ld-chr /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/partitioned_1kg_common/merged_sex_interaction_marginal. --overlap-annot \
-		--w-ld-chr /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/weights_1kg_common/1kg_cosmopolitan.common. --frqfile-chr /arc/project/st-dennisjk-1/shared/data/1000G_phase3_by_chr/plink/mapped_chr. --out /scratch/st-dennisjk-1/wcasazza/delahaye_QC/ldsc_results/merged_${1} \
-		--print-coefficients \
+		--ref-ld-chr /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/partitioned_1kg_common/merged_sex_interaction_marginal.\
+		--w-ld-chr /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/weights_1kg_common/1kg_cosmopolitan.common.\
+    --frqfile-chr /arc/project/st-dennisjk-1/shared/data/1000G_phase3_by_chr/plink/mapped_maf01_chr${1}.\
+    --out /scratch/st-dennisjk-2/wcasazza/delahaye_QC/ldsc_results/merged_${1} \
+    --overlap-annot \
+    --print-coefficients \
 		--print-delete-vals
 }
 
