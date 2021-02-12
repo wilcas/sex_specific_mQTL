@@ -9,10 +9,12 @@ out <- mclapply(
   function(i) {
     baseline <- fread(sprintf("/scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/baseline_annot_files/baselineLD.%d.annot.gz",i))
     annot <- fread(sprintf(annot_str, i))
+    merged <- merge(baseline,annot, by = c("CHR", "BP", "SNP", "CM"))
     for(j in 5:ncol(annot)){
+      to_select <- c("CHR", "BP", "SNP", "CM", colnames(annot)[j])
       fwrite(
-        merge(baseline,annot, by = c("CHR", "BP", "SNP", "CM"))[,c("CHR", "BP", "SNP", "CM",colnames(annot)[j])],
-        sprintf(paste0(colnames(annot)[j],"_",argv[[2]]), i),
+        merged[,..to_select],
+        sprintf(argv[[2]],colnames(annot)[j], i),
         row.names = F,
         sep = "\t",
         quote = F
