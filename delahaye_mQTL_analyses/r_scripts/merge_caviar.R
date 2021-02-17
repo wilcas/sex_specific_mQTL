@@ -27,7 +27,7 @@ if (file.exists(sprintf("%sdelahaye_caviar_cpp_annotations_chr%s.annot.gz", argv
       mc.cores = 32
     )
   )
-  snp_data <- fread("matrix_eqtl_data/snp_pos.txt")[CHR == sprintf("chr%s", argv[[1]])]
+  snp_data <- fread("/scratch/st-dennisjk-1/wcasazza/delahaye_QC/matrix_eqtl_data/snp_pos.txt")[CHR == sprintf("chr%s", argv[[1]])]
   maxCPP <- all_annotations[, .(SNP = SNP_ID, maxCPP = max(Causal_Post._Prob.)), by = "SNP_ID"]
   matched <- match(maxCPP$SNP, snp_data$SNP)
 
