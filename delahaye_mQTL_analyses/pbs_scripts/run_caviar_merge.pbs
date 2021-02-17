@@ -8,9 +8,10 @@
 #PBS -j oe
 #PBS -J 1-22
 ################################################################################
-cd /scratch/st-dennisjk-1/wcasazza/delahaye_QC/
+cd /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses/r_scripts/
+
 # Load software environment
 
 module load r
 
-Rscript merge_caviar.R $PBS_ARRAY_INDEX $Z_DIR
+Rscript merge_caviar.R $PBS_ARRAY_INDEX $Z_DIR $FILE_PREFIX
