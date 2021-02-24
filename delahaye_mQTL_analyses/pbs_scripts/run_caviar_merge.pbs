@@ -15,4 +15,7 @@ cd /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses/r_sc
 module load r
 
 Rscript merge_caviar.R $PBS_ARRAY_INDEX $Z_DIR $FILE_PREFIX
-Rscript merge_caviar.R $PBS_ARRAY_INDEX $Z_DIR $FILE_PREFIX
+
+Rscript match_annotation_baseline.R "${FILE_PREFIX}.%d.annot.gz" "${FILE_PREFIX}_%s.%d.annot.gz"
+
+Rscript make_cis_annotation.R ${MQTL} "${FILE_PREFIX}.%d.annot.gz" "${FILE_PREFIX}_all_cis"

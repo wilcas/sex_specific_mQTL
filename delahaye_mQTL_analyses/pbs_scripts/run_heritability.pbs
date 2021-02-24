@@ -11,14 +11,14 @@ module load parallel
 
 ldsc() {
 	/arc/project/st-dennisjk-1/software/ldsc/ldsc.py --h2 /scratch/st-dennisjk-1/wcasazza/tmp_GWAS/formatted_sumstats/${1}.sumstats.gz \
-		--ref-ld-chr /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/partitioned_1kg_common/merged_sex_interaction_marginal.\
+		--ref-ld-chr /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_annotations/${2}_${3}.,/scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/baseline_annot_files/baselineLD.\
 		--w-ld-chr /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/weights_1kg_common/1kg_cosmopolitan.common.\
-    --frqfile-chr /arc/project/st-dennisjk-1/shared/data/1000G_phase3_by_chr/plink/mapped_maf01_chr${1}.\
-    --out /scratch/st-dennisjk-2/wcasazza/delahaye_QC/ldsc_results/merged_${1} \
+    --frqfile-chr /arc/project/st-dennisjk-1/shared/data/1000G_phase3_by_chr/plink/mapped_maf01_chr.\
+    --out /scratch/st-dennisjk-1/wcasazza/delahaye_QC/ldsc_results/${2}_${3}_${1} \
     --overlap-annot \
     --print-coefficients \
 		--print-delete-vals
 }
 
-export -f ldsc
-parallel ldsc ::: adhd_jul2017 CAD_META rall_SCZ ukbb_preeclampsia_female AD_jansen_2019 IBS_Bonfiglio ukbb_preeclampsia_both_sexes
+#export -f ldsc
+#parallel ldsc ::: adhd_jul2017 CAD_META rall_SCZ ukbb_preeclampsia_female AD_jansen_2019 IBS_Bonfiglio ukbb_preeclampsia_both_sexes ::: marginal sex_interaction ::: bin_CPP maxCPP all_cis
