@@ -22,4 +22,4 @@ maxCPP <- all_annotations[, .(SNP = SNP_ID, maxCPP = max(Causal_Post._Prob.)), b
 matched <- match(maxCPP$SNP, snp_data$SNP)
 
 maxCPP <- maxCPP[, .(CHR = gsub("chr", "", snp_data$CHR[matched]), BP = snp_data$POS[matched], SNP = SNP, CM = 0, maxCPP, bin_CPP = as.numeric(maxCPP != 0))]
-fwrite(maxCPP, file = sprintf("%sdelahaye_caviar_cpp_annotations_chr%s.annot.gz", argv[[3]], argv[[1]]), row.names = F, quote = F, sep = "\t")
+fwrite(maxCPP, file = sprintf("%s.%s.annot.gz", argv[[3]], argv[[1]]), row.names = F, quote = F, sep = "\t")

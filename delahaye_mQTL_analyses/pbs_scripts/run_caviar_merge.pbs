@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#PBS -l walltime=10:00:00,select=1:ncpus=32:mem=60gb
+#PBS -l walltime=10:00:00,select=1:ncpus=4:mem=60gb
 #PBS -N caviar_merge
 #PBS -A st-dennisjk-1
 #PBS -m abe
@@ -16,6 +16,8 @@ module load r
 
 Rscript merge_caviar.R $PBS_ARRAY_INDEX $Z_DIR $FILE_PREFIX
 
-Rscript match_annotation_baseline.R "${FILE_PREFIX}.%d.annot.gz" "${FILE_PREFIX}_%s.%d.annot.gz"
+Rscript match_annotation_baseline.R "${FILE_PREFIX}.%d.annot.gz" "${FILE_PREFIX}_%s.%d.annot.gz" "${PBS_ARRAY_INDEX}"
 
-Rscript make_cis_annotation.R ${MQTL} "${FILE_PREFIX}.%d.annot.gz" "${FILE_PREFIX}_all_cis"
+Rscript make_cis_annotation.R ${MQTL} "${FILE_PREFIX}.%d.annot.gz" "${FILE_PREFIX}_all_cis" "${PBS_ARRAY_INDEX}"
+
+Rscript match_annotation_baseline.R "${FILE_PREFIX}_all_cis.%d.annot.gz" "${FILE_PREFIX}_%s.%d.annot.gz" "${PBS_ARRAY_INDEX}"
