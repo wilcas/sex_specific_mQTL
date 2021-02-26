@@ -11,4 +11,3 @@ interaction_job=$(qsub -v MQTL="${interaction_mqtl}",Z_DIR="/scratch/st-dennisjk
 marginal_job=$(qsub -v MQTL="${marginal_mqtl}",Z_DIR="/scratch/st-dennisjk-1/wcasazza/delahaye_QC/caviar_files/marginal",FILE_PREFIX="/scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_annotations/marginal" run_caviar_merge.pbs)
 
 qsub -W depend=afterok:${interaction_job}:${marginal_job} get_ldsc.pbs
-

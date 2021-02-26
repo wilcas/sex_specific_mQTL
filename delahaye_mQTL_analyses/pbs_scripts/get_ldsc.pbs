@@ -15,6 +15,6 @@ ldsc() {
 		--print-snps /arc/project/st-dennisjk-1/shared/data/1000G_phase3_info/1kg_phase3_maf01.${1}.snplist
 }
 
-export -f ldsc 
+export -f ldsc
 
 parallel ldsc ::: $PBS_ARRAY_INDEX ::: marginal sex_interaction ::: bin_CPP maxCPP all_cis

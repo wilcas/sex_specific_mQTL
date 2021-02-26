@@ -11,9 +11,8 @@ conda activate ldsc
 module load parallel
 ldsc() {
 	/arc/project/st-dennisjk-1/software/ldsc/ldsc.py --l2 --bfile /arc/project/st-dennisjk-1/shared/data/1000G_phase3_by_chr/plink/mapped_maf01_chr${1} \
-		--annot /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/baseline_annot_files/baselineLD.${1}.annot.gz --ld-wind-cm 1 --out /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/baseline_annot_files/baselineLD.${1}\
+		--annot /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/baseline_annot_files/baselineLD.${1}.annot.gz --ld-wind-cm 1 --out /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/baseline_annot_files/baselineLD.${1} \
 		--print-snps /arc/project/st-dennisjk-1/shared/data/1000G_phase3_info/1kg_phase3_maf01.${1}.snplist
 }
 
-ldsc  $PBS_ARRAY_INDEX
-
+ldsc $PBS_ARRAY_INDEX

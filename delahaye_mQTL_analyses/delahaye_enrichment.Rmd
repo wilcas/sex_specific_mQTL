@@ -254,21 +254,21 @@ ldsc_results_marginal <- rbindlist(lapply(dir("ldsc_results", pattern = ".*.resu
 
 ggplot(ldsc_results_marginal, aes(trait, Enrichment, fill = Category, ymin = Enrichment - Enrichment_std_error, ymax = Enrichment + Enrichment_std_error)) +
   geom_bar(stat = "identity", position = "dodge") +
-  geom_errorbar(position = "dodge") + 
-  theme_minimal()+
-  theme(axis.text.x = element_text(angle=90,hjust=1,vjust=1))
+  geom_errorbar(position = "dodge") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1))
 
-ggplot(ldsc_results_marginal[!grepl("maxCPP",Category)], aes(trait, Enrichment, fill = Category, ymin = Enrichment - Enrichment_std_error, ymax = Enrichment + Enrichment_std_error)) +
+ggplot(ldsc_results_marginal[grepl("maxCPP", Category)], aes(trait, Enrichment, fill = Category, ymin = Enrichment - Enrichment_std_error, ymax = Enrichment + Enrichment_std_error)) +
   geom_bar(stat = "identity", position = "dodge") +
-  geom_errorbar(position = "dodge") + 
-  theme_minimal()+
-  theme(axis.text.x = element_text(angle=90,hjust=1,vjust=1))
+  geom_errorbar(position = "dodge") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1))
 
-ggplot(ldsc_results_marginal[!grepl("maxCPP",Category)], aes(trait, Prop._h2, fill = Category, ymin = Prop._h2 - Prop._h2_std_error, ymax = Prop._h2 + Prop._h2_std_error)) +
+ggplot(ldsc_results_marginal[!grepl("maxCPP", Category)], aes(trait, Prop._h2, fill = Category, ymin = Prop._h2 - Prop._h2_std_error, ymax = Prop._h2 + Prop._h2_std_error)) +
   geom_bar(stat = "identity", position = "dodge") +
-  geom_errorbar(position = "dodge") + 
-  theme_minimal()+
-  theme(axis.text.x = element_text(angle=90,hjust=1,vjust=1))
+  geom_errorbar(position = "dodge") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1))
 
 ggplot(ldsc_results_marginal[grepl("SCZ|AD_j|adhd", trait) & !grepl("maxCPP", Category)], aes(trait, Enrichment, fill = Category, ymin = Enrichment - Enrichment_std_error, ymax = Enrichment + Enrichment_std_error)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -281,6 +281,31 @@ ggplot(ldsc_results_marginal[grepl("SCZ|AD_j|adhd", trait) & !grepl("maxCPP", Ca
 ggplot(ldsc_results_marginal[grepl("SCZ|AD_j|adhd", trait) & !grepl("maxCPP", Category)], aes(trait, Prop._h2, fill = Category, ymin = Prop._h2 - Prop._h2_std_error, ymax = Prop._h2 + Prop._h2_std_error)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_errorbar(position = "dodge")
+```
+
+## Revised analysis
+Before I neither included an intercept nor accounted for the baseline model:
+```{r}
+part_heritability_results <- lapply(
+  dir(
+    "/scratch/st-dennisjk-1/wcasazza/delahaye_QC/ldsc_results/",
+    pattern = "[marginal|sex_interaction].*.results",
+    full.names = TRUE
+  ),
+  function(f) {
+    labels <- str_match(f, ".*/(marginal|sex_interaction)_(all_cis|bin_CPP|maxCPP)_(.*).results")[-c(1)]
+    if (any(is.na(labels))) {
+      return(data.table())
+    } else {
+      dt <- fread(f)[1, !"Category"]
+      dt[, `:=`(mQTL_group = labels[1], annotation = labels[2], GWAS = labels[3])]
+      return(dt)
+    }
+  }
+)
+
+part_heritability_df <- rbindlist(part_heritability_results)
+ggplot()
 ```
 
 
