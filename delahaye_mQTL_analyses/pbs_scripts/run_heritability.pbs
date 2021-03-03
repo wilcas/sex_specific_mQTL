@@ -1,13 +1,25 @@
 #!/bin/bash
 #PBS -A st-dennisjk-1
-#PBS -l walltime=04:00:00,select=1:ncpus=4:mem=64gb
-#PBS -m be
+#PBS -l walltime=05:00:00,select=1:ncpus=2:mem=32gb
+#PBS -m a
+# N Jobs is number of GWASxnumber of mQTL setsxnumber of annotations
+#PBS -J 0-48 
+#PBS -j oe
 #PBS -M willcasazza@gmail.com
 ################################################################################
+GWAS=( adhd_jul2017 CAD_META rall_SCZ ukbb_preeclampsia_female AD_jansen_2019 IBS_Bonfiglio ukbb_preeclampsia_both_sexes iPSYCH-PGC_ASD_Nov2017 )
+MQTL=( marginal sex_interaction )
+ANNOTATION=( all_cis bin_CPP maxCPP )
 
+GWAS_N=${#GWAS[@]}
+MQTL_N=${#MQTL[@]}
+ANNOTATION_N=${#ANNOTATION[@]}
+
+CUR_GWAS=${GWAS[$((${PBS_ARRAY_INDEX}%${GWAS_N}))]}
+CUR_MQTL=${MQTL[$((${PBS_ARRAY_INDEX}%${MQTL_N}))]}
+CUR_ANNOTATION=${ANNOTATION[$((${PBS_ARRAY_INDEX}%${ANNOTATION_N}))]}
 source /home/wcasazza/miniconda3/bin/activate
 conda activate ldsc
-module load parallel
 
 ldsc() {
 	/arc/project/st-dennisjk-1/software/ldsc/ldsc.py --h2 /scratch/st-dennisjk-1/wcasazza/tmp_GWAS/formatted_sumstats/${1}.sumstats.gz \
@@ -17,5 +29,4 @@ ldsc() {
 		--print-delete-vals
 }
 
-export -f ldsc
-parallel -j2 ldsc ::: adhd_jul2017 CAD_META rall_SCZ ukbb_preeclampsia_female AD_jansen_2019 IBS_Bonfiglio ukbb_preeclampsia_both_sexes ::: marginal sex_interaction ::: bin_CPP maxCPP all_cis
+ldsc ${CUR_GWAS} ${CUR_MQTL} ${CUR_ANNOTATION}

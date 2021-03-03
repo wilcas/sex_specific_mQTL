@@ -1,15 +1,17 @@
 ---
 title: "Delahaye Post mQTL analyses"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
 library(data.table)
 library(tidyverse)
 library(qvalue)
-knitr::opts_chunk$set(echo = TRUE)
+setwd("/scratch/st-dennisjk-1/wcasazza/delahaye_QC/")
+knitr::opts_knit$set(root.dir = "/scratch/st-dennisjk-1/wcasazza/delahaye_QC/")
+knitr::opts_chunk$set(echo = TRUE,cache.lazy = FALSE,cache = FALSE,cache.path = "global_cache")
 ```
-```{r}
+```{r marginal hits}
 opt_pc <- fread("matrix_eqtl_data/cis_mQTL_9_methy_PC_all.txt", key = "SNP")
 delahaye <- fread("delahaye_2020_mQTL.csv")
 hist(opt_pc$`p-value`, breaks = 100)
@@ -17,32 +19,32 @@ sig_delahaye <- opt_pc[FDR < 0.05]
 ```
 ## Replication
 Delahaye and itself:
-```{r}
+```{r mqtl replication}
 delahaye_repeat_merged <- merge(opt_pc, delahaye, by.x = c("SNP", "gene"), by.y = c("SNPID", "cpgID"))
 1 - pi0est(delahaye_repeat_merged$`p-value`)$pi0
 ```
 
 Robinson and Delahaye
-```{r}
+```{r robinson loading}
 robinson_mqtl <- fread("../robinson_results/cis_impute_mQTL_results_6_methy_PC.txt")
 ```
 
-```{r}
+```{r robinson replication}
 robinson_matched <- merge(robinson_mqtl, sig_delahaye, by = c("SNP", "gene"))
 1 - pi0est(robinson_matched$`p-value.x`, m = nrow(robinson_matched))$pi0
 ```
 delahaye and robinson:
-```{r}
+```{r delahaye robinson}
 robinson_sig <- robinson_mqtl[FDR < 0.05]
 delahaye_matched <- merge(opt_pc, robinson_sig, by = c("SNP", "gene"))
 1 - pi0est(delahaye_matched$`p-value.x`, m = nrow(delahaye_matched))$pi0
 ```
 
 Delahaye and RICHS
-```{r}
+```{r richs mqtl load}
 richs_mqtl <- fread("../RICHS_QC/matrix_eqtl_data/cis_mQTL_9_methy_PC_all.txt")
 ```
-```{r}
+```{r richs delahaye pi1}
 
 richs_matched <- merge(richs_mqtl, sig_delahaye, by = c("SNP", "gene"))
 1 - pi0est(richs_matched$`p-value.x`, m = nrow(richs_matched))$pi0
@@ -51,11 +53,11 @@ richs_matched <- merge(richs_mqtl, sig_delahaye, by = c("SNP", "gene"))
 
 
 ## Sex specific mQTL
-```{r}
+```{r sex specific mqtl load}
 sex_spec <- fread("matrix_eqtl_data/cis_mQTL_9_methy_PC_all_sex_interaction.txt")
 sig_sex <- sex_spec[FDR < 0.05]
 ```
-```{r}
+```{r robinson sex specific hits}
 robinson_sex <- rbind(
   fread("../robinson_results/cis_int_sex_impute_mQTL_results_6_methy_PC.txt"),
   fread("../robinson_results/cis_pre_impute_mQTL_results_6_methy_PC_sex_interaction_chrX.txt")
