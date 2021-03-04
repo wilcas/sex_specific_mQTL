@@ -7,20 +7,21 @@ output: github_document
 library(data.table)
 library(tidyverse)
 library(qvalue)
+library(vroom)
 setwd("/scratch/st-dennisjk-1/wcasazza/delahaye_QC/")
 knitr::opts_knit$set(root.dir = "/scratch/st-dennisjk-1/wcasazza/delahaye_QC/")
 knitr::opts_chunk$set(echo = TRUE,cache.lazy = FALSE,cache = FALSE,cache.path = "global_cache")
 ```
 ```{r marginal hits}
-opt_pc <- fread("matrix_eqtl_data/cis_mQTL_9_methy_PC_all.txt", key = "SNP")
-delahaye <- fread("delahaye_2020_mQTL.csv")
-hist(opt_pc$`p-value`, breaks = 100)
-sig_delahaye <- opt_pc[FDR < 0.05]
+opt_pc <- vroom("matrix_eqtl_data/cis_mQTL_9_methy_PC_all.txt.gz", altrep = TRUE)
+delahaye <- vroom("delahaye_2020_mQTL.csv")
+# hist(opt_pc$`p-value`, breaks = 100)
+sig_delahaye <- opt_pc %>% filter(FDR < 0.05)
 ```
 ## Replication
 Delahaye and itself:
 ```{r mqtl replication}
-delahaye_repeat_merged <- merge(opt_pc, delahaye, by.x = c("SNP", "gene"), by.y = c("SNPID", "cpgID"))
+delahaye_repeat_merged <- opt_pc %>% right_join(delahaye, by.x = c("SNP", "gene"), by.y = c("SNPID", "cpgID"))
 1 - pi0est(delahaye_repeat_merged$`p-value`)$pi0
 ```
 
@@ -104,7 +105,9 @@ ggplot(delahaye_matched, aes(-log10(`p-value.x`), -log10(`p-value.y`))) +
   labs(x = "Delahaye Interaction", y = "RICHS Interaction") +
   coord_flip()
 ```
-
+## Thresholding Delahaye QTLs
+<!-- @todo implement QTL Quality filters -->
+<!-- @body delahaye et al 2018 use FDR based on 1000 permutations to narrow down their initial number, they then restrict 5% of each allelic dosage. I should report something at least including the dosage (especially in the sex specific hits) and perhaps a more stringent cutoff like bonferroni or a lower FDR. Another thing I should do is report those mQTLs with non-zero CPP in CAVIAR -->
 ## TESTING 
 Checking if these mQTLs include too many low-frequency snps:
 ```{r}

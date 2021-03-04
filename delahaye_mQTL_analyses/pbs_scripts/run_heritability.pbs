@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -A st-dennisjk-1
-#PBS -l walltime=05:00:00,select=1:ncpus=2:mem=32gb
+#PBS -l walltime=05:00:00,select=1:ncpus=4:mem=64gb
 #PBS -m a
 # N Jobs is number of GWASxnumber of mQTL setsxnumber of annotations
 #PBS -J 0-48 
