@@ -298,7 +298,12 @@ part_heritability_results <- lapply(
       return(data.table())
     } else {
       dt <- fread(f)[1, !"Category"]
-      dt[, `:=`(mQTL_group = labels[1], annotation = labels[2], GWAS = labels[3])]
+      dt[, 
+        `:=`(
+          Coefficient_p=pnorm(abs(`Coefficient_z-score`),lower.tail=F)*2,
+          mQTL_group = labels[1],
+          annotation = labels[2],
+          GWAS = labels[3])]
       return(dt)
     }
   }
@@ -317,7 +322,7 @@ ggplot(part_heritability_df %>% filter(annotation!="maxCPP"), aes(x=GWAS,y=Prop.
 ggplot(part_heritability_df %>% filter(!grepl("preeclampsia",GWAS),annotation!="maxCPP"), aes(x=GWAS,y=Prop._h2, fill=annotation,ymin=Prop._h2-Prop._h2_std_error,ymax=Prop._h2+Prop._h2_std_error)) + geom_bar(stat='identity',position="dodge") +geom_errorbar(position="dodge") + facet_grid(annotation~mQTL_group,scales = 'free_y') + theme_minimal() +theme(axis.text.x=element_text(angle = 90,hjust=1,vjust=1))
 
 ggplot(part_heritability_df, aes(x=GWAS,y=Coefficient, fill=annotation,ymin=Coefficient-Coefficient_std_error,ymax=Coefficient+Coefficient_std_error)) + geom_bar(stat='identity',position="dodge") +geom_errorbar(position="dodge") + facet_grid(annotation~mQTL_group,scales = 'free_y') + theme_minimal() +theme(axis.text.x=element_text(angle = 90,hjust=1,vjust=1))
-
+ggplot(part_heritability_df %>% filter(Coefficient_p < 0.05), aes(x=GWAS,y=Coefficient, fill=annotation,ymin=Coefficient-Coefficient_std_error,ymax=Coefficient+Coefficient_std_error)) + geom_bar(stat='identity',position="dodge") +geom_errorbar(position="dodge") + facet_grid(annotation~mQTL_group,scales = 'free_y') + theme_minimal() +theme(axis.text.x=element_text(angle = 90,hjust=1,vjust=1))
 ggplot(part_heritability_df %>% filter(!grepl("preeclampsia",GWAS)), aes(x=GWAS,y=Coefficient, fill=annotation,ymin=Coefficient-Coefficient_std_error,ymax=Coefficient+Coefficient_std_error)) + geom_bar(stat='identity',position="dodge") +geom_errorbar(position="dodge") + facet_grid(annotation~mQTL_group,scales = 'free_y') + theme_minimal() +theme(axis.text.x=element_text(angle = 90,hjust=1,vjust=1))
 
 

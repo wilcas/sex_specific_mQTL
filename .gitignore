@@ -1,7 +1,13 @@
+# Project files
+data/
 # PBS/torque script generated files
 **/connection_*.txt
 **/*.o[0-9]*
 **/*.e[0-9]*
+
+# Jupyter files
+.ipynb_checkpoints/
+
 # History files
 .Rhistory
 .Rapp.history

@@ -7,13 +7,19 @@ output: github_document
 library(tidyverse)
 library(data.table)
 library(qvalue)
+library(arrow)
 setwd("/scratch/st-dennisjk-1/wcasazza/delahaye_QC/")
 knitr::opts_knit$set(root.dir = "/scratch/st-dennisjk-1/wcasazza/delahaye_QC/")
-knitr::opts_chunk$set(echo = TRUE,cache.lazy = FALSE,cache = FALSE,cache.path = "global_cache")
+knitr::opts_chunk$set(echo = TRUE)
 ```
-```{r marginal hits}
-system.time(opt_pc <- fread("matrix_eqtl_data/cis_mQTL_9_methy_PC_all.txt"))
+```{r marginal hits import, cache=2,cache.extra = tools::md5sum(c("matrix_eqtl_data/cis_mQTL_9_methy_PC_all.txt","../RICHS_QC/matrix_eqtl_data/cis_mQTL_9_methy_PC_all.parquet","../robinson_results/cis_impute_mQTL_results_6_methy_PC.txt"))}
+system.time(opt_pc <- read_parquet("matrix_eqtl_data/cis_mQTL_9_methy_PC_all.parquet"))
+richs_mqtl <- fread("../RICHS_QC/matrix_eqtl_data/cis_mQTL_9_methy_PC_all.txt",key=c("SNP","gene"))
+robinson_mqtl <- fread("../robinson_results/cis_impute_mQTL_results_6_methy_PC.txt",key=c("SNP","gene"))
 delahaye <- fread("delahaye_2020_mQTL.csv")
+```
+
+```{r}
 hist(opt_pc$`p-value`, breaks = 100)
 sig_delahaye <- opt_pc[FDR < 0.05]
 ```
@@ -21,58 +27,51 @@ sig_delahaye <- opt_pc[FDR < 0.05]
 Delahaye and itself:
 ```{r mqtl replication}
 delahaye_repeat_merged <-merge(opt_pc,delahaye, by.x = c("SNP", "gene"), by.y = c("SNPID", "cpgID"))
-tryCatch(1 - pi0est(delahaye_repeat_merged$`p-value`)$pi0,"inf")
+(delahaye_repeat_pi1 <- tryCatch(1 - pi0est(delahaye_repeat_merged$`p-value`)$pi0,error=function(e) Inf))
 ```
 
 Robinson and Delahaye
-```{r robinson loading}
-robinson_mqtl <- fread("../robinson_results/cis_impute_mQTL_results_6_methy_PC.txt")
-```
-
 ```{r robinson replication}
-robinson_matched <- robinson_mqtl %>% left_join(sig_delahaye, by = c("SNP", "gene"))
-1 - pi0est(robinson_matched$`p-value.x`, m = nrow(robinson_matched))$pi0
+robinson_matched <- merge(robinson_mqtl,sig_delahaye, by = c("SNP", "gene"))
+(robinson_delahaye_pi1 <- tryCatch(1 - pi0est(robinson_matched$`p-value.x`, m = nrow(robinson_matched))$pi0,error=function(e) Inf))
 ```
 delahaye and robinson:
 ```{r delahaye robinson}
 robinson_sig <- robinson_mqtl[FDR < 0.05]
 delahaye_matched <- merge(opt_pc, robinson_sig, by = c("SNP", "gene"))
-1 - pi0est(delahaye_matched$`p-value.x`, m = nrow(delahaye_matched))$pi0
+(delahaye_robinson_pi1 <- tryCatch(1 - pi0est(delahaye_matched$`p-value.x`, m = nrow(delahaye_matched))$pi0,error=function(e) Inf))
 ```
 
 Delahaye and RICHS
-```{r richs mqtl load}
-richs_mqtl <- fread("../RICHS_QC/matrix_eqtl_data/cis_mQTL_9_methy_PC_all.txt")
-```
 ```{r richs delahaye pi1}
-
 richs_matched <- merge(richs_mqtl, sig_delahaye, by = c("SNP", "gene"))
-1 - pi0est(richs_matched$`p-value.x`, m = nrow(richs_matched))$pi0
+(richs_delahaye_pi <- 1 - pi0est(richs_matched$`p-value.x`, m = nrow(richs_matched))$pi0)
 ```
 
 
 
 ## Sex specific mQTL
-```{r sex specific mqtl load}
-sex_spec <- fread("matrix_eqtl_data/cis_mQTL_9_methy_PC_all_sex_interaction.txt")
+```{r sex specific mqtl load, cache=2,cache.extra=tools::md5sum(c("matrix_eqtl_data/cis_mQTL_9_methy_PC_all_sex_interaction.txt", "../robinson_results/cis_int_sex_impute_mQTL_results_6_methy_PC.txt","../robinson_results/cis_pre_impute_mQTL_results_6_methy_PC_sex_interaction_chrX.txt","../RICHS_QC/matrix_eqtl_data/cis_mQTL_9_methy_PC_all_sex_interaction.parquet"))}
+sex_spec <- read_parquet("matrix_eqtl_data/cis_mQTL_9_methy_PC_all_sex_interaction.parquet")
+robinson_sex <- rbind(
+  fread("../robinson_results/cis_int_sex_impute_mQTL_results_6_methy_PC.txt",key=c("SNP","gene")),
+  fread("../robinson_results/cis_pre_impute_mQTL_results_6_methy_PC_sex_interaction_chrX.txt",key=c("SNP","gene"))
+)
+richs_sex <- fread("../RICHS_QC/matrix_eqtl_data/cis_mQTL_9_methy_PC_all_sex_interaction.txt",key=c("SNP","gene"))
 sig_sex <- sex_spec[FDR < 0.05]
 ```
-```{r robinson sex specific hits}
-robinson_sex <- rbind(
-  fread("../robinson_results/cis_int_sex_impute_mQTL_results_6_methy_PC.txt"),
-  fread("../robinson_results/cis_pre_impute_mQTL_results_6_methy_PC_sex_interaction_chrX.txt")
-)
-```
 
+Robinson Delahaye replication
 ```{r}
 robinson_matched <- merge(robinson_sex, sig_sex, by = c("SNP", "gene"))
-1 - pi0est(robinson_matched$`p-value.x`, m = nrow(robinson_matched))$pi0
+(robinson_delahaye_sex_pi1 <- 1 - pi0est(robinson_matched$`p-value.x`, m = nrow(robinson_matched))$pi0)
 robinson_matched[FDR.x < 0.05]
 ggplot(robinson_matched, aes(-log10(`p-value.x`), -log10(`p-value.y`))) +
   geom_point() +
   labs(x = "Robinson Interaction", y = "Delahaye Interaction")
 ```
-delahaye and robinson:
+
+Delahaye and Robinson:
 ```{r}
 robinson_sig <- robinson_sex[FDR < 0.05]
 delahaye_matched <- merge(sex_spec, robinson_sig, by = c("SNP", "gene"))
@@ -85,9 +84,6 @@ ggplot(delahaye_matched, aes(-log10(`p-value.x`), -log10(`p-value.y`))) +
 ```
 
 Delahaye and RICHS
-```{r}
-richs_sex <- fread("../RICHS_QC/matrix_eqtl_data/cis_mQTL_9_methy_PC_all_sex_interaction.txt")
-```
 ```{r}
 richs_matched <- merge(richs_sex, sig_sex, by = c("SNP", "gene"))
 1 - qvalue::pi0est(richs_matched$`p-value.x`)$pi0
