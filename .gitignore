@@ -1,5 +1,7 @@
 # Project files
 data/
+delahaye_mQTL_analyses/dask-worker-space/
+
 # PBS/torque script generated files
 **/connection_*.txt
 **/*.o[0-9]*
