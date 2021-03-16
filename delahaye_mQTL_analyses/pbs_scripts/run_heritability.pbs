@@ -3,11 +3,11 @@
 #PBS -l walltime=05:00:00,select=1:ncpus=4:mem=64gb
 #PBS -m a
 # N Jobs is number of GWASxnumber of mQTL setsxnumber of annotations
-#PBS -J 0-48
+#PBS -J 0-54
 #PBS -j oe
 #PBS -M willcasazza@gmail.com
 ################################################################################
-GWAS=(adhd_jul2017 CAD_META rall_SCZ ukbb_preeclampsia_female AD_jansen_2019 IBS_Bonfiglio ukbb_preeclampsia_both_sexes iPSYCH-PGC_ASD_Nov2017)
+GWAS=(adhd_jul2017 CAD_META rall_SCZ ukbb_preeclampsia_female AD_jansen_2019 IBS_Bonfiglio ukbb_preeclampsia_both_sexes iPSYCH-PGC_ASD_Nov2017 pancancer_2020_lung)
 MQTL=(marginal sex_interaction)
 ANNOTATION=(all_cis bin_CPP maxCPP)
 
