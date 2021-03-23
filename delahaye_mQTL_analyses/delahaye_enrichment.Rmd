@@ -5,6 +5,7 @@ library(tidyverse)
 library(data.table)
 library(qqman)
 setwd("/scratch/st-dennisjk-1/wcasazza/delahaye_QC/")
+options(jupyter.plot_mimetypes = "image/svg+xml") 
 knitr::opts_knit$set(root.dir = "/scratch/st-dennisjk-1/wcasazza/delahaye_QC/")
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -284,6 +285,7 @@ ggplot(ldsc_results_marginal[grepl("SCZ|AD_j|adhd", trait) & !grepl("maxCPP", Ca
 ## Revised analysis
 Before I neither included an intercept nor accounted for the baseline model:
 ```{r fig.height=10, fig.width=10}
+options(repr.plot.width = 5, repr.plot.height = 4)
 part_heritability_results <- lapply(
   dir(
     "/scratch/st-dennisjk-1/wcasazza/delahaye_QC/ldsc_results/",
@@ -342,18 +344,19 @@ ggplot(
     scale_color_manual(values=c("black","red"),guide='none')
 
 
-subset_GWAS <- c("ADHD","ASD","SCZ","CAD", "Lung Cancer")
+subset_GWAS <- c("ADHD","ASD","SCZ","IBS","Alzheimer's","CAD")
 ggplot(
         part_heritability_df %>%
-        filter(!grepl("preeclampsia",GWAS),annotation == "bin_CPP", mQTL_group == "marginal") %>%
+        filter(!grepl("preeclampsia",GWAS),annotation == "bin_CPP") %>%
         mutate(
             significant=Enrichment_p < 0.05,
-            GWAS = recode(GWAS,!!!GWAS_key)
+            GWAS = recode(GWAS,!!!GWAS_key),
+            mQTL_group = recode(mQTL_group,marginal="Marginal",sex_interaction="Sex-Biased")
         ) %>% filter(GWAS %in% subset_GWAS ) %>% mutate(GWAS = factor(GWAS, levels= subset_GWAS)),
         aes(
             x=GWAS,
             y=Enrichment,
-            fill=annotation,
+            fill=mQTL_group,
             color=significant,
             ymin=Enrichment-Enrichment_std_error,
             ymax=Enrichment+Enrichment_std_error)
@@ -361,10 +364,11 @@ ggplot(
     geom_bar(stat='identity',position="dodge") +
     geom_errorbar(position="dodge") +
     theme_minimal() +
-    theme(axis.text.x=element_text(angle = 90,hjust=1,vjust=1),legend.position = "") +
-    scale_color_manual(values=c("black","red")) +
-    scale_fill_manual(values="#00BA38")+
-    ggtitle("Stratified LD-score enrichment of fine-mapped placental mQTLs")
+    theme(axis.text.x=element_text(angle = 90,hjust=1,vjust=1)) +
+    scale_color_manual(values=c("black","red"),guide=FALSE) +
+    scale_fill_brewer(palette="Spectral")+
+    labs(fill = "mQTL Group")+
+    ggtitle("Stratified LD-Score Enrichment of\nFine-Mapped Placental mQTLs")
 ggplot(
         part_heritability_df %>%
             filter(!grepl("preeclampsia",GWAS))%>%
