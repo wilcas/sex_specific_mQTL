@@ -16,5 +16,8 @@ ldsc() {
 }
 
 export -f ldsc
+if [[ -z ${ANNOTATIONS} ]]; then
+    ANNOTATIONS=("marginal" "sex_interaction")
+fi
 
-parallel ldsc ::: $PBS_ARRAY_INDEX ::: marginal sex_interaction ::: bin_CPP maxCPP all_cis
+parallel ldsc ::: $PBS_ARRAY_INDEX ::: ${ANNOTATIONS[@]} ::: bin_CPP maxCPP all_cis
