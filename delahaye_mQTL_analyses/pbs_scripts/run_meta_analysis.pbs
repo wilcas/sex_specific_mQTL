@@ -1,0 +1,32 @@
+#!/bin/bash
+#PBS -A st-dennisjk-1
+#PBS -l walltime=10:00:00,select=1:ncpus=32:mem=64gb
+#PBS -m be
+#PBS -M willcasazza@gmail.com
+################################################################################
+
+# First load environment
+module load gcc
+module load openblas
+module load gsl
+module load gnuplot
+source /scratch/st-dennisjk-1/wcasazza/.bashrc
+cd /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses/
+
+
+# sex-specific meta-analysis
+echo "/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/delahaye_sex_interaction" > "../data/besd.list"
+echo "/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/RICHS_sex_interaction" >> "../data/besd.list"
+smr_Linux --besd-flist "/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/besd.list"\
+    --mecs\
+    --thread-num 32 \
+    --out "../data/delahaye_richs_sex_interaction_mecs"
+
+
+# marginal meta-analysis
+echo "/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/delahaye_marginal" > "../data/besd.list"
+echo "/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/RICHS_marginal" >> "../data/besd.list"
+smr_Linux --besd-flist "/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/besd.list"\
+    --mecs\
+    --thread-num 32\
+    --out "../data/delahaye_richs_marginal_mecs"
