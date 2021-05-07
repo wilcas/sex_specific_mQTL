@@ -1,0 +1,19 @@
+#!/bin/bash
+#PBS -A st-dennisjk-1
+#PBS -l walltime=10:00:00,select=1:ncpus=32:mem=128gb
+#PBS -m be
+#PBS -M willcasazza@gmail.com
+################################################################################
+
+# First load environment
+module load gcc
+module load openblas
+module load gsl
+module load gnuplot
+source /home/wcasazza/miniconda3/bin/activate
+
+conda activate misc_bio
+
+
+Rscript /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses/r_scripts/common_factor_GWAS.R
+
