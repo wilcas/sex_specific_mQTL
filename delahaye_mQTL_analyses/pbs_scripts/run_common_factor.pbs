@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -A st-dennisjk-1
-#PBS -l walltime=10:00:00,select=1:ncpus=32:mem=128gb
+#PBS -l walltime=72:00:00,select=1:ncpus=32:mem=182gb
 #PBS -m be
 #PBS -M willcasazza@gmail.com
 ################################################################################
