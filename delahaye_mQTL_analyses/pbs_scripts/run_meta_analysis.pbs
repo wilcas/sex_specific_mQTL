@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -A st-dennisjk-1
-#PBS -l walltime=10:00:00,select=1:ncpus=32:mem=64gb
+#PBS -l walltime=15:00:00,select=1:ncpus=32:mem=64gb
 #PBS -m be
 #PBS -M willcasazza@gmail.com
 ################################################################################
@@ -15,18 +15,18 @@ cd /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses/
 
 
 # sex-specific meta-analysis
-echo "/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/delahaye_male" > "../data/besd.list"
-echo "/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/richs_male" >> "../data/besd.list"
-smr_Linux --besd-flist "/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/besd.list"\
-    --mecs\
-    --thread-num 32 \
-    --out "../data/delahaye_richs_male_mecs"
-
+#echo "/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/delahaye_male" > "../data/besd.list"
+#echo "/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/richs_male" >> "../data/besd.list"
+#smr_Linux --besd-flist "/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/besd.list"\
+#    --mecs\
+#    --thread-num 32 \
+#    --out "../data/delahaye_richs_male_mecs"
+#
 
 # marginal meta-analysis
 echo "/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/delahaye_female" > "../data/besd.list"
 echo "/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/richs_female" >> "../data/besd.list"
 smr_Linux --besd-flist "/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/besd.list"\
-    --mecs\
-    --thread-num 32\
+    --mecs \
+    --thread-num 40\
     --out "../data/delahaye_richs_female_mecs"

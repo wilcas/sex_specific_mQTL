@@ -21,7 +21,7 @@ delahaye_mQTL_analyses/dask-worker-space/
 
 # User-specific files
 .Ruserdata
-
+*.RDS
 # Example code in package build process
 *-Ex.R
 
