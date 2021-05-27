@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#PBS -l walltime=10:00:00,select=1:ncpus=16:mem=60gb
+#PBS -l walltime=10:00:00,select=1:ncpus=16:mem=64gb
 #PBS -N caviar
 #PBS -A st-dennisjk-1
 #PBS -m abe
@@ -46,7 +46,7 @@ run_caviar() {
 
 cd /scratch/st-dennisjk-1/wcasazza/delahaye_QC/
 
-# Execute the rserver within the rocker/rstudio container
+# Execute R
 Rscript prep_caviar_z.R ${CHR} ${MQTLS} ${Z_DIR}
 
 export -f run_caviar
