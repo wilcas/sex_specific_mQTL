@@ -54,5 +54,5 @@ export PLINK
 export CAVIAR
 export CHR
 
-find caviar_files/${Z_DIR}/chr${CHR}/ -maxdepth 1 | grep \.z | parallel run_caviar
+find caviar_files/${Z_DIR}/chr${CHR}/ -maxdepth 1 | grep \.z | parallel --results caviar_output run_caviar
 
