@@ -3,12 +3,10 @@
 #PBS -l walltime=10:00:00,select=1:ncpus=16:mem=64gb
 #PBS -N caviar
 #PBS -A st-dennisjk-1
-#PBS -m abe
-#PBS -M willcasazza@gmail.com
 #PBS -j oe
 #PBS -J 1-23
 ################################################################################
-
+set -e -x
 # Load software environment
 
 module load gsl
@@ -19,7 +17,8 @@ module load r
 # Set global variables
 PLINK="/arc/project/st-dennisjk-1/software/plink1.9/plink"
 CAVIAR="/arc/project/st-dennisjk-1/software/caviar/CAVIAR-C++/CAVIAR"
-
+Z_DIR="/tmp/marginal_meta"
+MQTLS="/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/delahaye_richs_marginal_meta_matrixeqtl.txt"
 if [[ $PBS_ARRAY_INDEX -eq 23 ]]; then
 	CHR="X"
 else
@@ -44,15 +43,23 @@ run_caviar() {
 	fi
 }
 
-cd /scratch/st-dennisjk-1/wcasazza/delahaye_QC/
 
-# Execute R
-Rscript prep_caviar_z.R ${CHR} ${MQTLS} ${Z_DIR}
+mkdir -p ${Z_DIR}/chr${CHR}/
+# Execute Rscript prep_caviar_z.R ${CHR} ${MQTLS} ${Z_DIR}
+Rscript /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses/r_scripts/prep_caviar_z.R ${CHR} ${MQTLS} ${Z_DIR}
 
 export -f run_caviar
 export PLINK
 export CAVIAR
 export CHR
 
-find caviar_files/${Z_DIR}/chr${CHR}/ -maxdepth 1 | grep \.z | parallel --results caviar_output run_caviar
+find ${Z_DIR}/chr${CHR}/ -maxdepth 1 | grep \.z | parallel run_caviar &>/dev/null
+
+Rscript /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses/r_scripts/merge_caviar.R "${CHR}" "${Z_DIR}" "${FILE_PREFIX}"
+
+Rscript /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses/r_scripts/match_annotation_baseline.R "${FILE_PREFIX}.%d.annot.gz" "${FILE_PREFIX}_%s.%d.annot.gz" "${CHR}"
+
+Rscript /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses/r_scripts/make_cis_annotation.R ${MQTLS} "${FILE_PREFIX}.%d.annot.gz" "${FILE_PREFIX}_all_cis" "${CHR}"
+
+Rscript /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses/r_scripts/match_annotation_baseline.R "${FILE_PREFIX}_all_cis.%d.annot.gz" "${FILE_PREFIX}_%s.%d.annot.gz" "${CHR}"
 
