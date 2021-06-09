@@ -13,13 +13,13 @@ module load parallel
 
 cd /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/
 CHR=${PBS_ARRAY_INDEX}
-mkdir baseline_annot_files/chr${CHR}
+mkdir baseline_EUR_annot_files/chr${CHR}
 
 make_annot() {
 	f=${1}
 	name=$(basename ${f})
-	/arc/project/st-dennisjk-1/software/ldsc/make_annot.py --bed-file $f --bimfile /arc/project/st-dennisjk-1/shared/data/1000G_phase3_by_chr/plink/mapped_maf01_chr${CHR}.bim \
-		--annot-file baseline_annot_files/chr${CHR}/${name%.*}.annot
+	/arc/project/st-dennisjk-1/software/ldsc/make_annot.py --bed-file $f --bimfile /arc/project/st-dennisjk-1/shared/data/1000G_EUR_ldsc_data/1000G_EUR_Phase3_plink/1000G.EUR.QC.${CHR}.bim \
+		--annot-file baseline_EUR_annot_files/chr${CHR}/${name%.*}.annot
 }
 export CHR
 export -f make_annot

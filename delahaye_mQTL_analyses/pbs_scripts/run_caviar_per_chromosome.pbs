@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#PBS -l walltime=10:00:00,select=1:ncpus=16:mem=64gb
+#PBS -l walltime=20:00:00,select=1:ncpus=16:mem=64gb
 #PBS -N caviar
 #PBS -A st-dennisjk-1
 #PBS -j oe
@@ -17,8 +17,6 @@ module load r
 # Set global variables
 PLINK="/arc/project/st-dennisjk-1/software/plink1.9/plink"
 CAVIAR="/arc/project/st-dennisjk-1/software/caviar/CAVIAR-C++/CAVIAR"
-Z_DIR="/tmp/marginal_meta"
-MQTLS="/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/delahaye_richs_marginal_meta_matrixeqtl.txt"
 if [[ $PBS_ARRAY_INDEX -eq 23 ]]; then
 	CHR="X"
 else
@@ -42,6 +40,11 @@ run_caviar() {
 		rm ${f}
 	fi
 }
+
+#if [[ -f ${FILE_PREFIX}_all_cis.${CHR}.annot.gzi ]] && [[ -f ${FILE_PREFIX}_maxCPP.${CHR}.annot.gz ]] || [[ -f  ${FILE_PREFIX}_bin_CPP.${CHR}.annot.gz ]]; then
+#
+#  exit 
+#fi
 
 
 mkdir -p ${Z_DIR}/chr${CHR}/
