@@ -1,7 +1,6 @@
 library(GenomicSEM)
 library(data.table)
 library(glue)
-library(parallel)
 sumstat_files <-c("/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_sumstats/adhd_jul2017.gz",
             "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_sumstats/anxiety.meta.full.fs.tbl.gz",
             "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_sumstats/anxiety.meta.full.cc.tbl.gz",
@@ -30,28 +29,16 @@ s_ld_dir <- "/scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_a
 baseline <- "/scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/baseline_EUR_annot_files/baselineLD_genomicSEM"
 frq <- "/arc/project/st-dennisjk-1/shared/data/1000G_EUR_ldsc_data/1000G_Phase3_frq/1000G.EUR.QC"
 wld <- "/scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/weights_hm3/EUR_weights"
-annotations <- c(
-    "male_meta_bin_CPP",
-    "female_meta_bin_CPP",
-    "cord_mqtl_bin_CPP",
-    "marginal_meta_maxCPP",
-    "sex_interaction_meta_maxCPP",
-    "cord_mqtl_maxCPP"
+
+annotation <- commandArgs(trailingOnly=TRUE)[[1]] 
+s_ld <- glue("{s_ld_dir}/{annotation}")
+result <- s_ldsc(
+    traits=traits,
+    sample.prev=sample_prev,
+    population.prev=population_prev,
+    ld=c(baseline, s_ld),
+    wld=wld,
+    frq=frq,
+    trait.names=trait_names
 )
-mclapply(
-    annotations,
-    function(annotation){
-        s_ld <- glue("{s_ld_dir}/{annotation}")
-        result <- s_ldsc(
-            traits=traits,
-            sample.prev=sample_prev,
-            population.prev=population_prev,
-            ld=c(baseline, s_ld),
-            wld=wld,
-            frq=frq,
-            trait.names=trait_names
-        )
-        saveRDS(result,"/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/SLDSCoutput_{annotation}.RDS")
-    },
-    mc.cores = length(annotations)
-)
+saveRDS(result,glue("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/SLDSCoutput_{annotation}.RDS"))

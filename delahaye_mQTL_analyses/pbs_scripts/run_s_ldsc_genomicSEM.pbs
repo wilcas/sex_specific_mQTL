@@ -1,0 +1,15 @@
+#!/bin/bash
+#PBS -A st-dennisjk-1
+#PBS -l walltime=10:00:00,select=1:ncpus=32:mem=183gb
+#PBS -m be
+#PBS -M willcasazza@gmail.com
+################################################################################
+PBS_ARRAY_INDEX=0
+source /home/wcasazza/miniconda3/bin/activate
+conda activate misc_bio
+
+ANNOTATIONS=( "male_meta_bin_CPP" "female_meta_bin_CPP" "cord_mqtl_bin_CPP" "marginal_meta_maxCPP" "sex_interaction_meta_maxCPP" "cord_mqtl_maxCPP" )
+ 
+
+cd /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses/r_scripts/
+Rscript fit_s_ldsc_genomicSEM.R ${ANNOTATIONS[$PBS_ARRAY_INDEX]}
