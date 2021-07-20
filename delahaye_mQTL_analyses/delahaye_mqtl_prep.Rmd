@@ -172,4 +172,3 @@ ggplot(to_plot, aes(PC, hits)) +
   geom_point() +
   geom_smooth()
 ```
-

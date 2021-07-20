@@ -12,7 +12,7 @@ sumstat_files <-c("/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_sumstats/adhd_ju
             "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_sumstats/pgc_alcdep.eur_unrelated.aug2018_release_refmt.txt.gz",
             "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_sumstats/pgc_bip_2018.gz",
             "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_sumstats/PGC_UKB_depression_genome-wide_fixed.txt.gz",
-            "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_sumstats/MDD2018_ex23andMe.gz",  
+            "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_sumstats/MDD2018_ex23andMe.gz",
             "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_sumstats/PGC3_SCZ_wave3_public.v2.tsv.gz",
             "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_sumstats/tag.cpd.tbl.gz",
             "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_sumstats/TS_Oct2018.gz",
@@ -30,7 +30,7 @@ baseline <- "/scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/baseline_EUR_anno
 frq <- "/arc/project/st-dennisjk-1/shared/data/1000G_EUR_ldsc_data/1000G_Phase3_frq/1000G.EUR.QC"
 wld <- "/scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/weights_hm3/EUR_weights"
 
-annotation <- commandArgs(trailingOnly=TRUE)[[1]] 
+annotation <- commandArgs(trailingOnly=TRUE)[[1]]
 s_ld <- glue("{s_ld_dir}/{annotation}")
 result <- s_ldsc(
     traits=traits,

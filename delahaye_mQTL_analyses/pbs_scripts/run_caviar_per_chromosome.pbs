@@ -43,7 +43,7 @@ run_caviar() {
 
 #if [[ -f ${FILE_PREFIX}_all_cis.${CHR}.annot.gzi ]] && [[ -f ${FILE_PREFIX}_maxCPP.${CHR}.annot.gz ]] || [[ -f  ${FILE_PREFIX}_bin_CPP.${CHR}.annot.gz ]]; then
 #
-#  exit 
+#  exit
 #fi
 
 
@@ -65,4 +65,3 @@ Rscript /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses
 Rscript /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses/r_scripts/make_cis_annotation.R ${MQTLS} "${FILE_PREFIX}.%d.annot.gz" "${FILE_PREFIX}_all_cis" "${CHR}"
 
 Rscript /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses/r_scripts/match_annotation_baseline.R "${FILE_PREFIX}_all_cis.%d.annot.gz" "${FILE_PREFIX}_%s.%d.annot.gz" "${CHR}"
-

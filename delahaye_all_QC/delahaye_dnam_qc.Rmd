@@ -25,7 +25,7 @@ library(data.table)
 1. Checking samples are what they say they are
     1. Check sex based on XY and XIST probe
     1. Check identity to ensure not array replicates
-1. cell type estimation and related 
+1. cell type estimation and related
 1. Normalization
 
 ### Gathering Samples
@@ -51,7 +51,7 @@ This data is often stored seperately as a supplementary file in GEO.
 # Magda's code
 
 # read in the 1st 5 lines of the file
-methy_data1 <- fread("/scratch/st-dennisjk-1/wcasazza/delahaye_QC/placenta_regulatory_landscape/RootStudyConsentSet_phs001717.PlacentalRegulation.v1.p1.c1.HMB-IRB-PUB-COL-MDS/GenotypeFiles/phg001182.v1.PlacentalRegulation.genotype-original-submission.divers_arrays.c1.HMB-IRB-PUB-COL-MDS.update/corrected_run44_NICHD_ctrl-bkg.txt") 
+methy_data1 <- fread("/scratch/st-dennisjk-1/wcasazza/delahaye_QC/placenta_regulatory_landscape/RootStudyConsentSet_phs001717.PlacentalRegulation.v1.p1.c1.HMB-IRB-PUB-COL-MDS/GenotypeFiles/phg001182.v1.PlacentalRegulation.genotype-original-submission.divers_arrays.c1.HMB-IRB-PUB-COL-MDS.update/corrected_run44_NICHD_ctrl-bkg.txt")
 methy_data2 <- fread("/scratch/st-dennisjk-1/wcasazza/delahaye_QC/placenta_regulatory_landscape/RootStudyConsentSet_phs001717.PlacentalRegulation.v1.p1.c1.HMB-IRB-PUB-COL-MDS/GenotypeFiles/phg001182.v1.PlacentalRegulation.genotype-original-submission.divers_arrays.c1.HMB-IRB-PUB-COL-MDS.update/corrected_run47_NICHD_ctrl_bkg.txt")[,-c(1)]
 methy_data <- cbind(methy_data1,methy_data2)
 run_44 <- unique(gsub("\\..*","",colnames(methy_data1)))
@@ -89,7 +89,7 @@ identical(colnames(meth.1), colnames(Detection.1))
 ```{r create mset}
 
 mset <- new("MethylSet",
-        SummarizedExperiment(assays = SimpleList(Meth = as.matrix(meth.1), 
+        SummarizedExperiment(assays = SimpleList(Meth = as.matrix(meth.1),
                                                  Unmeth = as.matrix(unmeth.1))),
         annotation = c(array="IlluminaHumanMethylation450k",annotation="ilmn12.hg19"),
         preprocessMethod = c(rg.norm='Raw (no normalization or bg correction)',
@@ -147,11 +147,11 @@ betasXIST <- betas[rownames(betas) %in% c("cg03554089", "cg12653510", "cg0553322
 dim(betasXIST)
 
 # color by metadata sex
-sexLabel <- as.vector(metadata$Gender) 
+sexLabel <- as.vector(metadata$Gender)
 table(sexLabel) # 23 males and 23 females
 sexLabel <- gsub("Female", "#CC79A7", sexLabel)
-sexLabel <- gsub("Male", "#0072B2", sexLabel) 
- 
+sexLabel <- gsub("Male", "#0072B2", sexLabel)
+
 batchLabel <- palette(rainbow(10))[as.factor(metadata$batch)]
 # cluster on XY probes - some mislabeled samples
 plot(ape::as.phylo(hclust(dist(t(betasXY)))), lab4ut="axial", type = "unrooted", edge.width=0.5, cex=0.8, tip.color=sexLabel)
@@ -189,7 +189,7 @@ failed <- detP > 0.01
 colMeans(failed) # average # failed probes per sample
 sum(rowMeans(failed)>0.2) # 323 failed probes (detP>0.01) in >20% samps
 failed <- rownames(detP[rowMeans(failed)>0.2,]) # vector of 350 failed probe IDs
-head(failed) 
+head(failed)
 
 # remove detP failing probes
 dim(betas) # 485512
@@ -226,21 +226,21 @@ dim(betas) # 332949 preprocessed autosomal probes
 
 #### Non-specific probes
 
-Based on the work of Magda (Price), we know that several probes on the 450K and EPIC arrays are non-specific to their target locations in the genome, that is, based on sequencing similarity they have been predicted to bind to multiple locations in the genome and are therefore cross-hybridizing and/or nonspecific. These probes are therefore not reliable, as we don't know which location in the genome they are actually reflecting the methylation patterns of, and we remove these probes prior to analysis. 
+Based on the work of Magda (Price), we know that several probes on the 450K and EPIC arrays are non-specific to their target locations in the genome, that is, based on sequencing similarity they have been predicted to bind to multiple locations in the genome and are therefore cross-hybridizing and/or nonspecific. These probes are therefore not reliable, as we don't know which location in the genome they are actually reflecting the methylation patterns of, and we remove these probes prior to analysis.
 
 ```{r cross hybridizing}
 priceAnno <- read.csv("/arc/project/st-dennisjk-1/wcasazza/methylation_QC_resources/price_et_al_450k_annot.csv")
-priceXY <- priceAnno[grepl("YES",priceAnno$XY_Hits),] #12388 
+priceXY <- priceAnno[grepl("YES",priceAnno$XY_Hits),] #12388
 priceAuto <- priceAnno[grepl("YES",priceAnno$Autosomal_Hits),] #40650
 
 # remove these CH probes
 dim(betas) # 485110
-betas <- betas[!(rownames(betas) %in% priceXY$ID), ] 
-betas <- betas[!(rownames(betas) %in% priceAuto$ID), ] 
+betas <- betas[!(rownames(betas) %in% priceXY$ID), ]
+betas <- betas[!(rownames(betas) %in% priceAuto$ID), ]
 dim(betas) # 443324
 ```
 
-#### Polymorphic 
+#### Polymorphic
 
 Probes with SNPs (>1% MAF) in the SBE site of the CpG of interest will be filtered using both Chen et al. 2013's annotation for the array (from the Weksberg lab) and Kasper D. Hansen's built in SNP data for the Illumina arrays. Information on Hansen's data can be found in the package pdf for the Illumina manifest. These objects are named 'SNPs.###CommonSingle' with ### corresponding to the version of dbSNP for which the data was constructed, higher numbers represent later versions of dbSNP.
 
@@ -256,7 +256,7 @@ Hansen: https://bioconductor.org/packages/release/data/annotation/manuals/Illumi
 # read in chen polymoprhic probes
 Chen <- readxl::read_xlsx("/arc/project/st-dennisjk-1/wcasazza/methylation_QC_resources/48640-polymorphic-CpGs-Illumina450k.xlsx")
 
-# Polymorphic CpGs (including polymorphic SBE sites) correspond to entries where BASE_FROM_SBE is less than or equal to 1 for infinium II probes and less than or equal to 2 for infinium I probes. 
+# Polymorphic CpGs (including polymorphic SBE sites) correspond to entries where BASE_FROM_SBE is less than or equal to 1 for infinium II probes and less than or equal to 2 for infinium I probes.
 str(Chen)
 Chen$BASE_FROM_SBE <- as.factor(Chen$BASE_FROM_SBE)
 levels(Chen$BASE_FROM_SBE) # 0, 1, and 2 probes are either polymorphic or have poly SBE
@@ -267,7 +267,7 @@ dim(ProbeII) # 57536 rows
 ProbeII$BASE_FROM_SBE <- factor(ProbeII$BASE_FROM_SBE)
 levels(ProbeII$BASE_FROM_SBE) # 0 and 1
 
-# select only those probes that have a MAF > 1% 
+# select only those probes that have a MAF > 1%
 dim(Chen) # 70889
 Chen_SNP <- Chen[which(Chen$AF > 0.01),]
 dim(Chen_SNP) # 14140
@@ -303,7 +303,7 @@ all.equal(rownames(betas), rownames(mset_filt)) # should be TRUE
 
 If I don't have rgset objects available for use with minfi's normalization functions, I would use one of these options. There are definitely other options out there (dasen for example) but tend to be more laborious to code, and are also used less frequently in the literature. Can check out if interested.
 
-##### 4.2.1 minfi::Quantile 
+##### 4.2.1 minfi::Quantile
 
 The minfi function for quantile normalization is applicable to both rgest and msets. For a description of this method, see Touleimat & Tost, 2012. *This function returns a GenomicRatioSet*. This method relies on a reference distribution of Type I probes that it normalizes the distribution of Type II probes against, so setting the seed is important to ensure the same random distribution of Type I reference probes is selected each time, for reproducible normalization.
 
@@ -328,4 +328,3 @@ The last method yielded the highest correlation between replicates, and the best
 write.table(metadata,"DNAm_w_paired_genotype_metadata.txt", row.names = F, quote=F,sep="\t")
 fwrite(as.data.frame(betas.quantile) %>% rownames_to_column("cpg"),"processed_DNAm_delahaye_quantile_norm.txt", quote=F, row.names = F,sep="\t")
 ```
-

@@ -113,13 +113,13 @@ ggplot(delahaye_matched, aes(-log10(`p-value.x`), -log10(`p-value.y`))) +
 
 ```
 
-## TESTING 
+## TESTING
 Checking if these mQTLs include too many low-frequency snps:
 ```{r}
 maf_table <- fread("placenta_regulatory_landscape/RootStudyConsentSet_phs001717.PlacentalRegulation.v1.p1.c1.HMB-IRB-PUB-COL-MDS/genotype_qc/all_imputed_r2_30_rsid.afreq")
 common_SNP <- maf_table[ALT_FREQS >= 0.01 & ALT_FREQS <= 0.99]$ID
 hits_common <- na.omit(sig_delahaye[common_SNP, on = "SNP"])
-``` 
+```
 
 ```{r}
 common_snp_rich <- fread("../RICHS_genotyping/phg001102.v1.RICHS.genotype-calls-matrixfmt.MEGA_Consortium.c1.GRU/all_imputed_r2_30_rsid.afreq")[ALT_FREQS >= 0.01 & ALT_FREQS <= 0.99]$ID
@@ -135,4 +135,3 @@ nrow(robinson_mqtl[`p-value` < (0.05 / nrow(robinson_mqtl))])
 length(unique(robinson_mqtl[FDR < 0.05]$gene))
 length(unique(robinson_mqtl[`p-value` < (0.05 / nrow(robinson_mqtl))]$gene))
 ```
-

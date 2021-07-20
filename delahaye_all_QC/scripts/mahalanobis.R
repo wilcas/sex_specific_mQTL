@@ -23,7 +23,7 @@ samples <- lapply(
 pop_samples <- list()
 for(i in 1:length(clusters$population)){
   pop_samples[[clusters$population[i]]] <-  kg_pcs %>%
-    filter(IID %in% samples[[i]]) %>% 
+    filter(IID %in% samples[[i]]) %>%
     select(contains("PC")) %>%
     filter(sqrt(mahalanobis(.,colMeans(.),cov(.))) < 4)
 }
@@ -52,12 +52,12 @@ print(pop_dists)
 assign_cluster <- pop_dists %>%
   mutate_at(vars(contains("_dist")),list("sd"=~ . > (4 * .))) %>%
   filter_at(vars(contains("sd")),all_vars(!.))%>%
-  select(-contains("sd")) %>% 
+  select(-contains("sd")) %>%
   pivot_longer(contains("dist")) %>%
   mutate(name=gsub("_dist","",name)) %>%
   group_by(FID,IID) %>%
   summarize(assigned=name[which.min(value)])
-reclassified_data <- data_projected %>% 
+reclassified_data <- data_projected %>%
   left_join(assign_cluster,by=c("FID","IID")) %>%
   replace_na(list(assigned="excluded"))
 write.table(
@@ -70,5 +70,3 @@ write.table(
   row.names = F,
   quote = F
 )
-                   
-

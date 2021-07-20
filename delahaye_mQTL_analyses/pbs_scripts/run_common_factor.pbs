@@ -16,4 +16,3 @@ conda activate misc_bio
 
 
 Rscript /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses/r_scripts/common_factor_GWAS.R
-

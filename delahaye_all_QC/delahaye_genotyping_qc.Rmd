@@ -36,7 +36,7 @@ metadata
 
 
 # Pre-Imputation QC RICHS
-## individual filtering 
+## individual filtering
 
 ```{bash}
 source /home/wcasazza/miniconda3/bin/activate
@@ -90,18 +90,18 @@ snakemake --configfile config.yaml -j4 genotype_qc/raw_data.1kg_pca.pcs
 ```{r}
 pcs <- fread(paste0(BASE_DIR,"raw_data.geno.maf.mind.sex_check.het_filter.ibd_filter.eigenvec"))
 plot_pcs <- function(dat,pc_col1,pc_col2,pc,what){
-    p1 <- dat %>%  
+    p1 <- dat %>%
       inner_join(metadata,by = c("V2"="SUBJECT_ID")) %>%
       mutate(Self.declared.race= as.factor(Self.declared.race)) %>%
-      ggplot(aes_string(pc_col1,pc_col2,color="Self.declared.race")) + 
-        geom_point() + 
+      ggplot(aes_string(pc_col1,pc_col2,color="Self.declared.race")) +
+        geom_point() +
         labs(x=sprintf("PC%d",pc),y=sprintf("PC%d",pc+1)) +
         ggtitle("PCA Placental Regulation")
-    p2 <- dat %>%  
+    p2 <- dat %>%
       inner_join(metadata,by = c("V2"="SUBJECT_ID")) %>%
       mutate(Self.declared.race= as.factor(Self.declared.race)) %>%
-      ggplot(aes_string(pc_col1,"Gestational.Age.at.Delivery",color="Self.declared.race")) + 
-        geom_point() + 
+      ggplot(aes_string(pc_col1,"Gestational.Age.at.Delivery",color="Self.declared.race")) +
+        geom_point() +
         labs(x=sprintf("PC%d",pc)) +
         ggtitle("PCA Placental Regulation vs. Age")
     if(what == "age"){
@@ -127,7 +127,7 @@ plot_pcs(pcs,"V7","V8",5,"age")
 panel_file <- fread("/arc/project/st-dennisjk-1/shared/data/1000G_phase3_info/integrated_call_samples_v3.20130502.ALL.panel")
 kg_case_matched_pcs <- fread(paste0(BASE_DIR,"raw_data.1kg_pca.pcs")) %>% inner_join(panel_file, by=c("IID"="sample")) %>% select(FID,IID,contains("PC"),pop,super_pop)
 cases_projected <- fread(paste0(BASE_DIR,"raw_data.kg_projection.txt"))%>% inner_join(metadata,by = c("IID"="SUBJECT_ID"))  %>% select(FID,IID,contains("PC"),Self.declared.race)%>% rename(pop=Self.declared.race) %>% mutate(super_pop="Placenta_DATA")
-kg_case_pcs <- rbind(kg_case_matched_pcs,cases_projected) 
+kg_case_pcs <- rbind(kg_case_matched_pcs,cases_projected)
 ggplot(kg_case_pcs,aes(PC1,PC2,color=super_pop)) + geom_point()
 ggplot(kg_case_pcs,aes(PC2,PC3,color=super_pop)) + geom_point()
 ggplot(kg_case_pcs,aes(PC3,PC4,color=super_pop)) + geom_point()
@@ -247,7 +247,7 @@ lapply(batch, function(x){
 })
 
 ```
-## Hardy weinberg 
+## Hardy weinberg
 ```{bash}
 source /home/wcasazza/miniconda3/bin/activate
 conda activate snakemake
@@ -315,4 +315,3 @@ source ~/miniconda3/bin/activate
 conda activate snakemake
 snakemake --configfile config.yaml -j20 TERRE_QC/raw_data.imputed.r2_30.hard_call.maf_mismatch.bed
 ```
-

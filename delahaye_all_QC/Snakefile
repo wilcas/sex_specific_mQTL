@@ -55,7 +55,7 @@ rule individual_qc:
         #checksex probes
         {config[plink]} --bfile "{wildcards.dataset}.geno.maf.mind" \
         --check-sex \
-        --out "{wildcards.dataset}.geno.maf.mind" 
+        --out "{wildcards.dataset}.geno.maf.mind"
 
         # filter out samples that don't pass check
         cat {wildcards.dataset}.geno.maf.mind.sexcheck |
@@ -65,7 +65,7 @@ rule individual_qc:
         {config[plink]} --bfile "{wildcards.dataset}.geno.maf.mind" \
             --remove {wildcards.dataset}.sex_failed.txt \
             --make-bed \
-            --out "{wildcards.dataset}.geno.maf.mind.sex_check" 
+            --out "{wildcards.dataset}.geno.maf.mind.sex_check"
 
         # Compute method of moments heritability F
         {config[plink]} --bfile "{wildcards.dataset}.geno.maf.mind.sex_check" \
@@ -76,7 +76,7 @@ rule individual_qc:
         {config[plink]} --bfile "{wildcards.dataset}.geno.maf.mind.sex_check"\
             --remove {wildcards.dataset}.f_failed.txt \
             --make-bed \
-            --out "{wildcards.dataset}.geno.maf.mind.sex_check.het_filter" 
+            --out "{wildcards.dataset}.geno.maf.mind.sex_check.het_filter"
         """
         )
 
@@ -596,11 +596,11 @@ rule merge_imputed_and_filter:
         for full_f in {input.dosage}; do
             f=$(basename $full_f)
             (
-                {config[bcftools]} filter -e "R2<{thresh}" --threads {config[threads]} -O z -o ${{f%%.*}}_r2_{wildcards.thresh}.vcf.gz $f 
-                {config[tabix]} -p vcf ${{f%%.*}}_r2_{wildcards.thresh}.vcf.gz 
-                {config[bcftools]} annotate -a {config[kg_vars]} -c CHROM,ID -O z --threads {config[threads]} -o ${{f%%.*}}_r2_{wildcards.thresh}_rsid.vcf.gz ${{f%%.*}}_r2_{wildcards.thresh}.vcf.gz 
+                {config[bcftools]} filter -e "R2<{thresh}" --threads {config[threads]} -O z -o ${{f%%.*}}_r2_{wildcards.thresh}.vcf.gz $f
+                {config[tabix]} -p vcf ${{f%%.*}}_r2_{wildcards.thresh}.vcf.gz
+                {config[bcftools]} annotate -a {config[kg_vars]} -c CHROM,ID -O z --threads {config[threads]} -o ${{f%%.*}}_r2_{wildcards.thresh}_rsid.vcf.gz ${{f%%.*}}_r2_{wildcards.thresh}.vcf.gz
             ) &
-        done 
+        done
         wait
         cd ..
         {config[bcftools]} concat  {data_dir}/chr{{1..22}}_r2_{wildcards.thresh}_rsid.vcf.gz {data_dir}/chrX_r2_{wildcards.thresh}_rsid.vcf.gz -o {data_dir}/all_imputed_r2_{wildcards.thresh}_rsid.vcf.gz
@@ -697,7 +697,7 @@ rule dosage_maf:
         {config[plink2]} --data {wildcards.data_dir}/all_imputed_r2_{wildcards.thresh}_rsid ref-unknown\
             --exclude {wildcards.data_dir}/all_freq_to_remove.txt\
             --recode A-transpose\
-            --out {outfile} 
+            --out {outfile}
 
         {config[plink2]} --data {wildcards.data_dir}/all_imputed_r2_{wildcards.thresh}_rsid ref-unknown\
             --exclude {wildcards.data_dir}/all_freq_to_remove.txt\
