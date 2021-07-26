@@ -1,0 +1,23 @@
+#!/bin/bash
+#PBS -A st-dennisjk-1
+#PBS -l walltime=3:00:00,select=1:ncpus=32:mem=182gb
+#PBS -m be
+#PBS -M willcasazza@gmail.com
+################################################################################
+
+source /home/wcasazza/miniconda3/bin/activate
+conda activate misc_bio
+module load parallel
+
+cd /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/
+
+convert() {
+
+  Rscript matrixeqtl_fmt.R "delahaye_richs_${1}_mecs.txt" "delahaye_richs_${1}_meta_matrixeqtl.txt"
+
+}
+
+
+export -f convert
+parallel convert ::: male female
+#marginal sex_interaction male female
