@@ -17,13 +17,14 @@ all_annotations <- rbindlist(
       cpg <- gsub(".*/(.*)\\.out_post", "\\1", fname)
       df <- fread(fname)
       df$probe <- cpg
+      return(df)
     },
     mc.cores = 32
   )
 )
 snp_data <- fread("/scratch/st-dennisjk-1/wcasazza/delahaye_QC/matrix_eqtl_data/snp_pos.txt")[CHR == sprintf("chr%s", argv[[1]])]
-maxCPP <- all_annotations[Causal_Post._Prob. > 0, .(SNP = SNP_ID, probe, Causal_Post._Prob., SNPmax = SNP[which.max(Causal_Post._Prob.)], probemax = probe[which.max(Causal_Post._Prob.)]), by = "SNP_ID"]
+maxCPP <- all_annotations[Causal_Post._Prob. > 0, .(SNP = SNP_ID, probe, CPP = Causal_Post._Prob.)]
 matched <- match(maxCPP$SNP, snp_data$SNP)
 
-maxCPP <- maxCPP[, .(CHR = gsub("chr", "", snp_data$CHR[matched]), BP = snp_data$POS[matched], SNP, probe, probemax, SNPmax)]
+maxCPP <- maxCPP[, .(CHR = gsub("chr", "", snp_data$CHR[matched]), BP = snp_data$POS[matched], SNP, probe, CPP)]
 fwrite(maxCPP, file = sprintf("%s.%s.txt.gz", argv[[3]], argv[[1]]), row.names = F, quote = F, sep = "\t")
