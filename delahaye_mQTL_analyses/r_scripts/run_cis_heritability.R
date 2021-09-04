@@ -1,10 +1,10 @@
 library(data.table)
 library(batchtools)
 
-probes <- fread("/scratch/st-dennisjk-1/wcasazza/delahaye_QC/matrix_eqtl_data/probe_pos.txt")[chr != "chrX"]
+probes <- fread("/scratch/st-dennisjk-1/wcasazza/delahaye_QC/matrix_eqtl_data/probe_pos.txt")[chr != "chrX" & !(geneid %in% gsub(".hsq", "", dir("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/gcta_analysis/delahaye_output/")))]
 run_reml <- function(j) {
   library(data.table)
-  probes <- fread("/scratch/st-dennisjk-1/wcasazza/delahaye_QC/matrix_eqtl_data/probe_pos.txt")[chr != "chrX"]
+  probes <- fread("/scratch/st-dennisjk-1/wcasazza/delahaye_QC/matrix_eqtl_data/probe_pos.txt")[chr != "chrX" & !(geneid %in% gsub(".hsq", "", dir("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/gcta_analysis/delahaye_output/")))]
   snps <- fread("/scratch/st-dennisjk-1/wcasazza/delahaye_QC/matrix_eqtl_data/snp_pos.txt")
 
   all_cpgs <- colnames(fread("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/gcta_analysis/delahaye_methy_mvalues.phen", nrows = 1))[-c(1, 2)]
@@ -34,7 +34,10 @@ run_reml <- function(j) {
       s2 <- probes$s2[i]
       chr <- probes$chr[i]
       mpheno <- which(all_cpgs == cpg)
-      if (!file.exists(sprintf("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/gcta_analysis/delahaye_snps/%s_snps.txt", cpg))) {
+      grm_file <- sprintf("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/gcta_analysis/delahaye_grm/%s.grm.gz", cpg)
+      hsq_file <- sprintf("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/gcta_analysis/delahaye_output/%s.hsq", cpg)
+      snp_file <- sprintf("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/gcta_analysis/delahaye_snps/%s_snps.txt", cpg)
+      if (!file.exists(snp_file) & !file.exists(hsq_file)) {
         fwrite(
           snps[CHR == chr & (POS >= s1 - 75000 & POS <= s2 + 75000), .(SNP)],
           sprintf("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/gcta_analysis/delahaye_snps/%s_snps.txt", cpg),
@@ -43,12 +46,11 @@ run_reml <- function(j) {
           row.names = F
         )
       }
-      grm_file <- sprintf("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/gcta_analysis/delahaye_grm/%s.grm.gz", cpg)
-      hsq_file <- sprintf("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/gcta_analysis/delahaye_output/%s.hsq", cpg)
       if (!file.exists(grm_file) & !file.exists(hsq_file)) {
         tmp <- sprintf(grm_cmd, cpg, cpg, cpg)
         system(tmp, intern = FALSE)
-
+      }
+      if (!file.exists(hsq_file)) {
         tmp <- sprintf(reacta_cmd, cpg, mpheno, cpg)
         system(tmp, intern = FALSE)
       }
