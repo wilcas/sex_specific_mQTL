@@ -12,7 +12,7 @@ run_reml <- function(j) {
     "/arc/project/st-dennisjk-1/software/plink2.0/plink2",
     "--bfile", "/scratch/st-dennisjk-1/wcasazza/delahaye_QC/placenta_regulatory_landscape/RootStudyConsentSet_phs001717.PlacentalRegulation.v1.p1.c1.HMB-IRB-PUB-COL-MDS/genotype_qc/imputed_geno_for_heritability_maf01",
     "--extract", "/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/gcta_analysis/delahaye_snps/%s_snps.txt",
-    "--thread-num", "16",
+    "--thread-num", "32",
     "--make-grm-list",
     "--out", "/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/gcta_analysis/delahaye_grm/%s",
     "&& gzip /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/gcta_analysis/delahaye_grm/%s.grm"
@@ -27,7 +27,7 @@ run_reml <- function(j) {
     "--thread-num", "16",
     "--out", "/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/gcta_analysis/delahaye_output/%s"
   )
-  parallelMap::parallelMap(
+  parallelMap::parallelMap( # SWAP ORDER OF FUNCTION AND LIST FOR PARALLELMAP
     function(i) {
       cpg <- probes$geneid[i]
       s1 <- probes$s1[i]
@@ -66,5 +66,12 @@ tmp <- makeRegistry("/scratch/st-dennisjk-1/wcasazza/registry_default", make.def
 tmp$cluster.functions <- makeClusterFunctionsTORQUE("~/.config/batchtools/torque-lido.tmpl")
 idx <- 1:nrow(probes)
 job_ids <- batchMap(fun = run_reml, split(idx, cut(idx, 12)), reg = tmp)
-res <- list(walltime = 60 * 60 * 24, memory = 128, pm.backend = "multicore", ncpus = 32, allocation = "st-dennisjk-1", conda.env = "~/miniconda3/envs/misc_bio/bin/activate")
+res <- list(
+  walltime = 60 * 60 * 24,
+  memory = 128,
+  pm.backend = "multicore",
+  ncpus = 32,
+  allocation = "st-dennisjk-1",
+  conda.env = "~/miniconda3/envs/misc_bio/bin/activate"
+)
 submitJobs(ids = job_ids, res = res)
