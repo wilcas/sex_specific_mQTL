@@ -2,33 +2,37 @@
 #PBS -A st-dennisjk-1
 #PBS -l walltime=05:00:00,select=1:ncpus=4:mem=64gb
 # N Jobs is number of GWASxnumber of mQTL setsxnumber of annotations
-#PBS -J 0-192
+#PBS -J 0-24
 #PBS -j oe
 ################################################################################
 GWAS=(adhd_jul2017 anxiety.meta.full.cc.tbl anxiety.meta.full.fs.tbl AUDIT_UKB_2018_AJP.txt Cannabis_ICC_23andmetop_UKB_het.txt iPSYCH-PGC_ASD_Nov2017 ocd_aug2017 PGC3_SCZ_wave3_public.v2.tsv pgc_adhd_females pgc_adhd_males pgc_alcdep.eur_unrelated.aug2018_release.txt pgcAN2.2019-07.vcf.tsv pgc_bip_2018 pgc.cross.full.2013-03.txt PGC_UKB_depression_genome-wide.txt pts_all_freeze2_females.results pts_all_freeze2_males.results pts_all_freeze2_overall.results TS_Oct2018 NEW_META_PGC_iPSYCH_ASD_males NEW_META_PGC_iPSYCH_ASD_females tag.cpd.tbl meta_STDERR_mdd_eur_auto_M1_08_gcOFF_pgc.txt meta_STDERR_mdd_eur_auto_F1_08_gcOFF_pgc.txt)
 
-MQTL=( marginal male female cord_mqtl) # male_specific_meta female_specific_meta  sex_interaction_meta marginal_meta male_meta cord_mqtl female_meta)
-ANNOTATION=( bin_CPP_her maxCPP_her ) #all_cis bin_CPP maxCPP)
-
+ANNOTATION=( all_cis ) #bin_CPP_her maxCPP_her ) #all_cis bin_CPP maxCPP)
 COMBN=()
 for a in ${GWAS[@]}; do
-	for b in ${MQTL[@]}; do
-		for c in ${ANNOTATION[@]}; do
-			COMBN+=("${a} ${b} ${c}")
-		done
-	done
+  for c in ${ANNOTATION[@]}; do
+    COMBN+=("${a} ${c}")
+  done
 done
 echo "${#COMBN[@]}"
 read -a CUR <<< "${COMBN[$PBS_ARRAY_INDEX]}"
 CUR_GWAS=${CUR[0]}
-CUR_MQTL=${CUR[1]}
-CUR_ANNOTATION=${CUR[2]}
+CUR_ANNOTATION=${CUR[1]}
+
 source /home/wcasazza/miniconda3/bin/activate
 conda activate ldsc
 ldsc() {
-	if [ ! -f "/scratch/st-dennisjk-1/wcasazza/delahaye_QC/ldsc_meta_EUR_pgc_results/${2}_${3}_${1}.results" ]; then
+	if [ ! -f "/scratch/st-dennisjk-1/wcasazza/delahaye_QC/ldsc_meta_EUR_pgc_results/${2}_${1}_shared.results" ]; then
+    VARS=(  /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_annotations/marginal_${2}.
+      /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_annotations/sex_interaction_${2}.
+      /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_annotations/male_${2}.
+      /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_annotations/female_${2}.
+      /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_annotations/cord_mqtl_${2}.
+      /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/baseline_EUR_annot_files/baselineLD_fixed. )
+    VARS=${VARS[@]}
+    VARS=${VARS// /,}
 		/arc/project/st-dennisjk-1/software/ldsc/ldsc.py --h2 /scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/${1}.sumstats.gz \
-			--ref-ld-chr /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_annotations/${2}_${3}.,/scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/baseline_EUR_annot_files/baselineLD_fixed. --w-ld-chr /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/weights_hm3/EUR_weights. --frqfile-chr /arc/project/st-dennisjk-1/shared/data/1000G_EUR_ldsc_data/1000G_Phase3_frq/1000G.EUR.QC. --out /scratch/st-dennisjk-1/wcasazza/delahaye_QC/ldsc_meta_EUR_pgc_results/${2}_${3}_${1} \
+			--ref-ld-chr "${VARS}" --w-ld-chr /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/weights_hm3/EUR_weights. --frqfile-chr /arc/project/st-dennisjk-1/shared/data/1000G_EUR_ldsc_data/1000G_Phase3_frq/1000G.EUR.QC. --out /scratch/st-dennisjk-1/wcasazza/delahaye_QC/ldsc_meta_EUR_pgc_results/${2}_${1}_shared \
 			--overlap-annot \
 			--print-coefficients \
 			--print-delete-vals
@@ -36,4 +40,4 @@ ldsc() {
 	fi
 }
 
-ldsc ${CUR_GWAS} ${CUR_MQTL} ${CUR_ANNOTATION}
+ldsc ${CUR_GWAS} ${CUR_ANNOTATION}
