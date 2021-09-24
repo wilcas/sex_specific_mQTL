@@ -28,4 +28,4 @@ if [[ -z ${ANNOTATIONS} ]]; then
     ANNOTATIONS=("marginal_meta" "sex_interaction_meta" "female_meta" "male_meta")
 fi
 
-parallel ldsc ::: $PBS_ARRAY_INDEX ::: ${ANNOTATIONS[@]} ::: bin_CPP_her maxCPP_her all_cis
+parallel ldsc ::: $PBS_ARRAY_INDEX ::: ${ANNOTATIONS[@]} ::: all_cis_fdr
