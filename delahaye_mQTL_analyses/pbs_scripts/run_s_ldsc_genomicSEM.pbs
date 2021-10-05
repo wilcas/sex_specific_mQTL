@@ -2,7 +2,7 @@
 #PBS -A st-dennisjk-1
 #PBS -l walltime=10:00:00,select=1:ncpus=32:mem=183gb
 #PBS -m be
-#PBS -J 0-2
+#PBS -J 0-1
 #PBS -M willcasazza@gmail.com
 ################################################################################
 source /home/wcasazza/miniconda3/bin/activate
@@ -10,11 +10,11 @@ conda activate misc_bio
 
 #ANNOTATIONS=( "male_meta_bin_CPP" "female_meta_bin_CPP" "cord_mqtl_bin_CPP" "marginal_meta_maxCPP" "sex_interaction_meta_maxCPP" "cord_mqtl_maxCPP" )
 
-ANNOTATIONS=( "sex_interaction_bin_CPP_her" "marginal_bin_CPP_her" )
+ANNOTATIONS=( "male_specific_bin_CPP_her,female_specific_bin_CPP_her,marginal_bin_CPP_her,sex_interaction_bin_CPP_her" "male_bin_CPP_her,female_bin_CPP_her,marginal_bin_CPP_her,sex_interaction_bin_CPP_her")
 
 #ANNOTATIONS=( "male_bin_CPP_her" "female_bin_CPP_her" "cord_mqtl_bin_CPP_her" "marginal_maxCPP_her" "sex_interaction_maxCPP_her" "male_maxCPP_her" "female_maxCPP_her" "cord_mqtl_maxCPP_her" )
-
+OUTNAMES=( "sex_specific_shared" "sex_stratified_shared" )
 echo ${#ANNOTATIONS[@]}
 
 cd /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses/r_scripts/
-Rscript fit_s_ldsc_genomicSEM.R ${ANNOTATIONS[$PBS_ARRAY_INDEX]}
+Rscript fit_s_ldsc_genomicSEM.R ${ANNOTATIONS[$PBS_ARRAY_INDEX]} ${OUTNAMES[$PBS_ARRAY_INDEX]}

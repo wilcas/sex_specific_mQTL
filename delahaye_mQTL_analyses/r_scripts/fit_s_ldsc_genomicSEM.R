@@ -30,9 +30,10 @@ s_ld_dir <- "/scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_a
 baseline <- "/scratch/st-dennisjk-1/wcasazza/1000G_v2.2_baseline/baselineLD"
 frq <- "/scratch/st-dennisjk-1/wcasazza/1000G_Phase3_frq/1000G.EUR.QC"
 wld <- "/scratch/st-dennisjk-1/wcasazza/weights_hm3_no_hla/weights"
-
-annotation <- commandArgs(trailingOnly = TRUE)[[1]]
+argv <- commandArgs(trailingOnly = TRUE)
+annotation <- strsplit(argv[[1]], ",")[[1]]
 s_ld <- glue("{s_ld_dir}/{annotation}")
+print(s_ld)
 result <- s_ldsc(
   traits = traits,
   sample.prev = sample_prev,
@@ -42,4 +43,4 @@ result <- s_ldsc(
   frq = frq,
   trait.names = trait_names
 )
-saveRDS(result, glue("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/SLDSCoutput_{annotation}.RDS"))
+saveRDS(result, glue("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/SLDSCoutput_{argv[[2]]}.RDS"))
