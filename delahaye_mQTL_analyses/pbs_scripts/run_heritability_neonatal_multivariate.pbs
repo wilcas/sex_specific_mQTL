@@ -1,0 +1,40 @@
+#!/bin/bash
+#PBS -A st-dennisjk-1
+#PBS -l walltime=05:00:00,select=1:ncpus=4:mem=64gb
+# N Jobs is number of GWASxnumber of mQTL setsxnumber of annotations
+#PBS -J 0-35
+#PBS -j oe
+################################################################################
+GWAS=( age_asthma_irnt.gwas.imputed_v3.both_sexes.tsv age_asthma_irnt.gwas.imputed_v3.female.tsv age_asthma_irnt.gwas.imputed_v3.male.tsv age_asthma_raw.gwas.imputed_v3.both_sexes.tsv age_asthma_raw.gwas.imputed_v3.female.tsv age_asthma_raw.gwas.imputed_v3.male.tsv age_diabetes_irnt.gwas.imputed_v3.both_sexes.tsv age_diabetes_irnt.gwas.imputed_v3.female.tsv age_diabetes_irnt.gwas.imputed_v3.male.tsv age_diabetes_raw.gwas.imputed_v3.both_sexes.tsv age_diabetes_raw.gwas.imputed_v3.female.tsv age_diabetes_raw.gwas.imputed_v3.male.tsv age_hay_fever_irnt.gwas.imputed_v3.both_sexes.tsv age_hay_fever_irnt.gwas.imputed_v3.female.tsv age_hay_fever_irnt.gwas.imputed_v3.male.tsv age_hay_fever_raw.gwas.imputed_v3.both_sexes.tsv age_hay_fever_raw.gwas.imputed_v3.female.tsv age_hay_fever_raw.gwas.imputed_v3.male.tsv CHILD_ONSET_ASTHMA.20180501.allchr.assoc.GC EGG_BMI_HapMap_DISCOVERY.txt EGG_HC_DISCOVERY.v2.txt EGG_Obesity_Meta_Analysis_1.txt EGG_TANNER_females.v2.txt EGG_TANNER_males_and_females_combined.v2.txt EGG_TANNER_males.v2.txt EGG-TotalGWG-Offspring.txt Pubertal_growth_10F_12M_combined.txt Pubertal_growth_10F.txt Pubertal_growth_12M.txt Pubertal_growth_PGF_PGM_combined.txt Pubertal_growth_PGF.txt Pubertal_growth_PGM.txt Pubertal_growth_PTF_PTM_combined.txt Pubertal_growth_PTF.txt Pubertal_growth_PTM.txt ukbb_preeclampsia.gwas.imputed_v3.female.tsv )
+
+ANNOTATION=(  bin_CPP_her )
+COMBN=()
+for a in ${GWAS[@]}; do
+  for c in ${ANNOTATION[@]}; do
+    COMBN+=("${a} ${c}")
+  done
+done
+echo "${#COMBN[@]}"
+read -a CUR <<< "${COMBN[$PBS_ARRAY_INDEX]}"
+CUR_GWAS=${CUR[0]}
+CUR_ANNOTATION=${CUR[1]}
+
+source /home/wcasazza/miniconda3/bin/activate
+conda activate ldsc
+ldsc() {
+    VARS=(  /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_annotations/marginal_${2}.
+      /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_annotations/sex_interaction_${2}.
+      /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_annotations/male_specific_${2}.
+      /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_annotations/female_specific_${2}.
+      /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_annotations/cord_mqtl_${2}.
+      /scratch/st-dennisjk-1/wcasazza/1000G_v2.2_baseline/baselineLD. )
+    VARS=${VARS[@]}
+    VARS=${VARS// /,}
+		/arc/project/st-dennisjk-1/software/ldsc/ldsc.py --h2 /scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/${1}.sumstats.gz \
+			--ref-ld-chr "${VARS}" --w-ld-chr /scratch/st-dennisjk-1/wcasazza/1000G_Phase3_weights_hm3_no_MHC/weights.hm3_noMHC. --frqfile-chr /scratch/st-dennisjk-1/wcasazza/1000G_Phase3_frq/1000G.EUR.QC. --out /scratch/st-dennisjk-1/wcasazza/delahaye_QC/ldsc_meta_EUR_neonatal_original_baseline/${2}_${1}_shared_sex_specific \
+			--overlap-annot \
+			--print-coefficients \
+			--print-delete-vals
+}
+
+ldsc ${CUR_GWAS} ${CUR_ANNOTATION}
