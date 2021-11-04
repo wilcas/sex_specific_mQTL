@@ -23,7 +23,6 @@ source /home/wcasazza/miniconda3/bin/activate
 conda activate ldsc
 ldsc() {
     VARS=(  /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_annotations/marginal_${2}.
-      /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_annotations/sex_interaction_${2}.
       /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_annotations/male_specific_${2}.
       /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_annotations/female_specific_${2}.
       /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_annotations/cord_mqtl_${2}.
@@ -31,7 +30,7 @@ ldsc() {
     VARS=${VARS[@]}
     VARS=${VARS// /,}
 		/arc/project/st-dennisjk-1/software/ldsc/ldsc.py --h2 /scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/${1}.sumstats.gz \
-			--ref-ld-chr "${VARS}" --w-ld-chr /scratch/st-dennisjk-1/wcasazza/1000G_Phase3_weights_hm3_no_MHC/weights.hm3_noMHC. --frqfile-chr /scratch/st-dennisjk-1/wcasazza/1000G_Phase3_frq/1000G.EUR.QC. --out /scratch/st-dennisjk-1/wcasazza/delahaye_QC/ldsc_meta_EUR_pgc_original_baseline/${2}_${1}_shared_sex_specific \
+			--ref-ld-chr "${VARS}" --w-ld-chr /scratch/st-dennisjk-1/wcasazza/1000G_Phase3_weights_hm3_no_MHC/weights.hm3_noMHC. --frqfile-chr /scratch/st-dennisjk-1/wcasazza/1000G_Phase3_frq/1000G.EUR.QC. --out /scratch/st-dennisjk-1/wcasazza/delahaye_QC/ldsc_meta_EUR_pgc_original_baseline/${2}_${1}_shared_no_interaction \
 			--overlap-annot \
 			--print-coefficients \
 			--print-delete-vals
