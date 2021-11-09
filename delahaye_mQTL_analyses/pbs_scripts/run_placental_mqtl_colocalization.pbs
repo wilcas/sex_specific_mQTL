@@ -1,0 +1,11 @@
+#!/bin/bash
+#PBS -A st-dennisjk-1
+#PBS -l walltime=05:00:00,select=1:ncpus=16:mem=64gb
+#PBS -J 1-14
+#PBS -j oe
+################################################################################
+
+
+module load singularity
+
+singularity exec /arc/project/st-dennisjk-1/software/jupyter/jupyter-datascience.sif Rscript /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses/r_scripts/placental_mqtl_colocalization.R "neonatal" $PBS_ARRAY_INDEX
