@@ -5,7 +5,6 @@
 #PBS -J 0-35
 #PBS -j oe
 ################################################################################
-GWAS=( age_asthma_irnt.gwas.imputed_v3.both_sexes.tsv age_asthma_irnt.gwas.imputed_v3.female.tsv age_asthma_irnt.gwas.imputed_v3.male.tsv age_asthma_raw.gwas.imputed_v3.both_sexes.tsv age_asthma_raw.gwas.imputed_v3.female.tsv age_asthma_raw.gwas.imputed_v3.male.tsv age_diabetes_irnt.gwas.imputed_v3.both_sexes.tsv age_diabetes_irnt.gwas.imputed_v3.female.tsv age_diabetes_irnt.gwas.imputed_v3.male.tsv age_diabetes_raw.gwas.imputed_v3.both_sexes.tsv age_diabetes_raw.gwas.imputed_v3.female.tsv age_diabetes_raw.gwas.imputed_v3.male.tsv age_hay_fever_irnt.gwas.imputed_v3.both_sexes.tsv age_hay_fever_irnt.gwas.imputed_v3.female.tsv age_hay_fever_irnt.gwas.imputed_v3.male.tsv age_hay_fever_raw.gwas.imputed_v3.both_sexes.tsv age_hay_fever_raw.gwas.imputed_v3.female.tsv age_hay_fever_raw.gwas.imputed_v3.male.tsv CHILD_ONSET_ASTHMA.20180501.allchr.assoc.GC EGG_BMI_HapMap_DISCOVERY.txt EGG_HC_DISCOVERY.v2.txt EGG_Obesity_Meta_Analysis_1.txt EGG_TANNER_females.v2.txt EGG_TANNER_males_and_females_combined.v2.txt EGG_TANNER_males.v2.txt EGG-TotalGWG-Offspring.txt Pubertal_growth_10F_12M_combined.txt Pubertal_growth_10F.txt Pubertal_growth_12M.txt Pubertal_growth_PGF_PGM_combined.txt Pubertal_growth_PGF.txt Pubertal_growth_PGM.txt Pubertal_growth_PTF_PTM_combined.txt Pubertal_growth_PTF.txt Pubertal_growth_PTM.txt ukbb_preeclampsia.gwas.imputed_v3.female.tsv )
 
 ANNOTATION=(  bin_CPP_her )
 COMBN=()
