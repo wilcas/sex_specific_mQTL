@@ -4,7 +4,7 @@ library(coloc)
 library(bigsnpr)
 library(parallel)
 library(glue)
-argv <- commandArgs(trailingOnly = TRUE)
+argv <- list("neonatal", 4) # commandArgs(trailingOnly = TRUE)
 
 marginal_bonf <- fread("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/marginal_mcpg_bonf.txt.gz", key = "SNP")[p < 0.05]
 rds <- snp_readBed2("/arc/project/st-dennisjk-1/shared/data/1000G_EUR_ldsc_data/1000G_EUR_Phase3_plink/1000G.EUR.QC.ALL.bed", backingfile = tempfile())
@@ -173,7 +173,7 @@ gwas <- fread(sumstat_files[i])
 tmp_marginal_bonf <- marginal_bonf[intersect(gwas$SNP, reference$map$marker.ID), on = "SNP", nomatch = 0]
 print("Reading in elligble CpG sites")
 eligible_cpg <- unlist(mclapply(
-  unique(tmp_marginal_bonf$Probe),
+  unique(tmp_marginal_bonf$Probe)[1:100],
   function(probe) {
     mqtl <- tmp_marginal_bonf[Probe == probe]
     gwas_tmp <- gwas[mqtl$SNP, on = "SNP"]
