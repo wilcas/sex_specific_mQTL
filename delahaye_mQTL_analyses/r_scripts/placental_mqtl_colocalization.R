@@ -4,14 +4,14 @@ library(coloc)
 library(bigsnpr)
 library(parallel)
 library(glue)
-argv <- list("neonatal", 4) # commandArgs(trailingOnly = TRUE)
+argv <- commandArgs(trailingOnly = TRUE)
 
 marginal_bonf <- fread("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/marginal_mcpg_bonf.txt.gz", key = "SNP")[p < 0.05]
 rds <- snp_readBed2("/arc/project/st-dennisjk-1/shared/data/1000G_EUR_ldsc_data/1000G_EUR_Phase3_plink/1000G.EUR.QC.ALL.bed", backingfile = tempfile())
 
 reference <- snp_attach(rds)
 
-compute_coloc <- function(SNP, mqtl, gwas, method = "coloc", type = "quant", s = NULL) { # SNP must be in SNP column of mqtl and gwas
+compute_coloc <- function(SNP, mqtl, gwas, method = "coloc", type = "quant", s = NA) { # SNP must be in SNP column of mqtl and gwas
   D1 <- list(
     beta = mqtl$b,
     varbeta = mqtl$SE^2,
@@ -21,7 +21,7 @@ compute_coloc <- function(SNP, mqtl, gwas, method = "coloc", type = "quant", s =
     MAF = mqtl$Freq,
     type = "quant"
   )
-  if (is.null(s)) {
+  if (is.na(s)) {
     D2 <- list(
       pvalues = pnorm(-abs(gwas$Z)) * 2,
       z = gwas$Z,
@@ -97,10 +97,10 @@ if (argv[[1]] == "PGC") {
   )
   sample_prev <- c(
     0.36,
-    NULL,
+    NA,
     0.33,
     0.23,
-    NULL,
+    NA,
     0.30,
     0.40,
     0.28,
@@ -109,7 +109,7 @@ if (argv[[1]] == "PGC") {
     0.34,
     0.35,
     0.42,
-    NULL,
+    NA,
     0.34,
     0.15
   )
@@ -147,19 +147,19 @@ if (argv[[1]] == "PGC") {
     "CHILD_ASTHMA"
   )
   sample_prev <- c(
-    NULL,
+    NA,
     0.399,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
+    NA,
+    NA,
+    NA,
+    NA,
+    NA,
+    NA,
+    NA,
+    NA,
+    NA,
+    NA,
+    NA,
     0.0288
   )
 }
@@ -171,23 +171,17 @@ if (file.exists(glue("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/{tr
 
 gwas <- fread(sumstat_files[i])
 tmp_marginal_bonf <- marginal_bonf[intersect(gwas$SNP, reference$map$marker.ID), on = "SNP", nomatch = 0]
+tmp_marginal_bonf <- merge(tmp_marginal_bonf, gwas, by = "SNP")
 print("Reading in elligble CpG sites")
-eligible_cpg <- unlist(mclapply(
-  unique(tmp_marginal_bonf$Probe)[1:100],
-  function(probe) {
-    mqtl <- tmp_marginal_bonf[Probe == probe]
-    gwas_tmp <- gwas[mqtl$SNP, on = "SNP"]
-    return(min(mqtl$p) < 5e-8 & max(abs(gwas_tmp$Z)) > 5.45)
-  },
-  mc.cores = 32
-))
-if (sum(eligible_cpg) > 0) {
+eligible_cpg <- tmp_marginal_bonf[max(abs(Z)) > 5.45, .(Zmax = max(abs(Z)), minp = min(p)), by = "Probe"][Zmax > 5.45 & minp < 5e-8]$Probe
+print(length(eligible_cpg))
+if (length(eligible_cpg) > 0) {
   print("starting colocalization")
   test <- mclapply(
-    unique(tmp_marginal_bonf$Probe)[eligible_cpg],
+    eligible_cpg,
     function(probe) {
-      mqtl <- tmp_marginal_bonf[Probe == probe]
-      gwas_tmp <- gwas[SNP %in% mqtl$SNP]
+      mqtl <- tmp_marginal_bonf[probe, on = "Probe"]
+      gwas_tmp <- gwas[mqtl$SNP, on = "SNP"]
       invisible(
         capture.output(res <- compute_coloc(
           mqtl$SNP,
@@ -195,14 +189,14 @@ if (sum(eligible_cpg) > 0) {
           gwas_tmp,
           method = "coloc",
           s = sample_prev[i],
-          type = ifelse(is.null(sample_prev[i]), "quant", "cc")
+          type = ifelse(is.na(sample_prev[i]), "quant", "cc")
         )$summary)
       )
       return(res)
     },
     mc.cores = 32
   )
-  names(test) <- unique(tmp_marginal_bonf$Probe)[eligible_cpg]
+  names(test) <- eligible_cpg
   result <- rbindlist(lapply(test, function(x) data.table(t(x))), idcol = "probe")
 
   fwrite(
