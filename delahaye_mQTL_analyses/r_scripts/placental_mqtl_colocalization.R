@@ -128,7 +128,10 @@ if (argv[[1]] == "PGC") {
     "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/EGG_BMI_HapMap_DISCOVERY.txt.sumstats.gz",
     "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/Pubertal_growth_10F_12M_combined.txt.sumstats.gz",
     "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/EGG_HC_DISCOVERY.v2.txt.sumstats.gz",
-    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/CHILD_ONSET_ASTHMA.20180501.allchr.assoc.GC.sumstats.gz"
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/CHILD_ONSET_ASTHMA.20180501.allchr.assoc.GC.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/interpreggen.fetal.pe.meta.release.31jan2017.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/mat_all_chrALL_STERR_EU.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/ukbb_preeclampsia.gwas.imputed_v3.female.tsv.sumstats.gz"
   )
   trait_names <- c(
     "PGF_PGM",
@@ -144,7 +147,10 @@ if (argv[[1]] == "PGC") {
     "EGG_BMI",
     "10F_12M",
     "EGG_GC",
-    "CHILD_ASTHMA"
+    "CHILD_ASTHMA",
+    "FETAL_PREECLAMPSIA",
+    "MATERNAL_PREECLAMPSIA",
+    "UKBB_PREECLAMPSIA"
   )
   sample_prev <- c(
     NA,
@@ -160,7 +166,129 @@ if (argv[[1]] == "PGC") {
     NA,
     NA,
     NA,
-    0.0288
+    0.0288,
+    0.00862,
+    0.5,
+    0.0108
+  )
+} else if (argv[[1]] == "male") {
+  marginal_bonf <- fread("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/male_mcpg_bonf.txt.gz", key = "SNP")[p < 0.05]
+  sumstat_files <- c(
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/age_asthma_irnt.gwas.imputed_v3.male.tsv.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/age_hay_fever_raw.gwas.imputed_v3.male.tsv.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/age_asthma_raw.gwas.imputed_v3.male.tsv.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/EGG_TANNER_males.v2.txt.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/age_diabetes_irnt.gwas.imputed_v3.male.tsv.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/age_diabetes_raw.gwas.imputed_v3.male.tsv.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/ukbb_preeclampsia.gwas.imputed_v3.male.tsv.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/age_hay_fever_irnt.gwas.imputed_v3.male.tsv.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/meta_STDERR_bip_eur_auto_M1_08_gcOFF_pgc.txt.gz.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/OCD_meta_male_auto_072416.gz.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/meta_STDERR_mdd_eur_auto_M1_08_gcOFF_pgc.txt.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/pgc_adhd_males.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/meta_STDERR_rmdd_eur_auto_M1_08_gcOFF_pgc.txt.gz.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/pts_all_freeze2_males.results.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/meta_STDERR_scz_eur_auto_M1_08_gcOFF_pgc.txt.gz.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/ukbb_anxiety.gwas.imputed_v3.male.tsv.gz.fixed.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/NEW_META_PGC_iPSYCH_ASD_males.sumstats.gz"
+  )
+  trait_names <- c(
+    "AGE_ASTHMA_MALE(irnt)",
+    "HAY_FEVER_MALE(raw)",
+    "AGE_ASTHMA_MALE(raw)",
+    "TANNER_STAGE_MALE",
+    "AGE_DIABETES_MALE(irnt)",
+    "AGE_DIABETES_MALE(raw)",
+    "HAY_FEVER_MALE(irnt)",
+    "BIP_MALE",
+    "OCD_MALE",
+    "MDD_MALE",
+    "ADHD_MALE",
+    "RMDD_MALE",
+    "PTSD_MALE",
+    "SCZ_MALE",
+    "UKBB_ANXIETY_MALE",
+    "ASD_MALE"
+  )
+  sample_prev <- c(
+    NA,
+    NA,
+    NA,
+    NA,
+    NA,
+    NA,
+    NA,
+    0.351,
+    0.309,
+    0.309,
+    0.441,
+    0.245,
+    0.127,
+    0.517,
+    0.0109,
+    0.482
+  )
+} else if (argv[[1]] == "female") {
+  marginal_bonf <- fread("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/female_mcpg_bonf.txt.gz", key = "SNP")[p < 0.05]
+  sumstat_files <- c(
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/age_asthma_irnt.gwas.imputed_v3.female.tsv.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/age_hay_fever_raw.gwas.imputed_v3.female.tsv.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/age_asthma_raw.gwas.imputed_v3.female.tsv.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/EGG_TANNER_females.v2.txt.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/age_diabetes_irnt.gwas.imputed_v3.female.tsv.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/age_diabetes_raw.gwas.imputed_v3.female.tsv.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/ukbb_preeclampsia.gwas.imputed_v3.female.tsv.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/age_hay_fever_irnt.gwas.imputed_v3.female.tsv.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/meta_STDERR_bip_eur_auto_F1_08_gcOFF_pgc.txt.gz.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/OCD_meta_female_auto_072416.gz.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/meta_STDERR_mdd_eur_auto_F1_08_gcOFF_pgc.txt.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/pgc_adhd_females.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/meta_STDERR_rmdd_eur_auto_F1_08_gcOFF_pgc.txt.gz.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/pts_all_freeze2_females.results.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/meta_STDERR_scz_eur_auto_F1_08_gcOFF_pgc.txt.gz.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/ukbb_anxiety.gwas.imputed_v3.female.tsv.gz.fixed.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/NEW_META_PGC_iPSYCH_ASD_females.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/mat_all_chrALL_STERR_EU.sumstats.gz"
+  )
+  trait_names <- c(
+    "AGE_ASTHMA_FEMALE(irnt)",
+    "HAY_FEVER_FEMALE(raw)",
+    "AGE_ASTHMA_FEMALE(raw)",
+    "TANNER_STAGE_FEMALE",
+    "AGE_DIABETES_FEMALE(irnt)",
+    "AGE_DIABETES_FEMALE(raw)",
+    "UKBB_PREECLAMPSIA_FEMALE",
+    "HAY_FEVER_FEMALE(irnt)",
+    "BIP_FEMALE",
+    "OCD_FEMALE",
+    "MDD_FEMALE",
+    "ADHD_FEMALE",
+    "RMDD_FEMALE",
+    "PTSD_FEMALE",
+    "SCZ_FEMALE",
+    "UKBB_ANXIETY_FEMALE",
+    "ASD_FEMALE",
+    "MATERNAL_PREECLAMPSIA_FEMALE"
+  )
+  sample_prev <- c(
+    NA,
+    NA,
+    NA,
+    NA,
+    NA,
+    NA,
+    0.0108,
+    NA,
+    0.43,
+    0.261,
+    0.477,
+    0.233,
+    0.402,
+    0.283,
+    0.37,
+    0.0162,
+    0.236,
+    0.5
   )
 }
 result <- list()
