@@ -131,7 +131,8 @@ if (argv[[1]] == "PGC") {
     "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/CHILD_ONSET_ASTHMA.20180501.allchr.assoc.GC.sumstats.gz",
     "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/interpreggen.fetal.pe.meta.release.31jan2017.sumstats.gz",
     "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/mat_all_chrALL_STERR_EU.sumstats.gz",
-    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/ukbb_preeclampsia.gwas.imputed_v3.female.tsv.sumstats.gz"
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/ukbb_preeclampsia.gwas.imputed_v3.female.tsv.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/T1D.UCSC_META.sumstats.gz"
   )
   trait_names <- c(
     "PGF_PGM",
@@ -150,7 +151,8 @@ if (argv[[1]] == "PGC") {
     "CHILD_ASTHMA",
     "FETAL_PREECLAMPSIA",
     "MATERNAL_PREECLAMPSIA",
-    "UKBB_PREECLAMPSIA"
+    "UKBB_PREECLAMPSIA",
+    "Type 1 Diabetes"
   )
   sample_prev <- c(
     NA,
@@ -169,7 +171,8 @@ if (argv[[1]] == "PGC") {
     0.0288,
     0.00862,
     0.5,
-    0.0108
+    0.0108,
+    0.0364
   )
 } else if (argv[[1]] == "male") {
   marginal_bonf <- fread("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/male_mcpg_bonf.txt.gz", key = "SNP")[p < 0.05]
