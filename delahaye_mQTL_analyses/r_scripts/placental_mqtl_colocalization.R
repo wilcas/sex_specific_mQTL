@@ -5,8 +5,15 @@ library(bigsnpr)
 library(parallel)
 library(glue)
 argv <- commandArgs(trailingOnly = TRUE)
+which_sex <- argv[[3]]
+if (which_sex == "") {
+  marginal_bonf <- fread("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/marginal_mcpg_bonf.txt.gz", key = "SNP")[p < 0.05]
+} else if (which_sex == "male_mqtl") {
+  marginal_bonf <- fread("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/male_mcpg_bonf.txt.gz", key = "SNP")[p < 0.05]
+} else if (which_sex == "female_mqtl") {
+  marginal_bonf <- fread("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/female_mcpg_bonf.txt.gz", key = "SNP")[p < 0.05]
+}
 
-marginal_bonf <- fread("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/marginal_mcpg_bonf.txt.gz", key = "SNP")[p < 0.05]
 rds <- snp_readBed2("/arc/project/st-dennisjk-1/shared/data/1000G_EUR_ldsc_data/1000G_EUR_Phase3_plink/1000G.EUR.QC.ALL.bed", backingfile = tempfile())
 
 reference <- snp_attach(rds)
@@ -132,7 +139,11 @@ if (argv[[1]] == "PGC") {
     "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/interpreggen.fetal.pe.meta.release.31jan2017.sumstats.gz",
     "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/mat_all_chrALL_STERR_EU.sumstats.gz",
     "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/ukbb_preeclampsia.gwas.imputed_v3.female.tsv.sumstats.gz",
-    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/T1D.UCSC_META.sumstats.gz"
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/T1D.UCSC_META.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/EGG-GWAS-BL.txt.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/Fetal_BW_European_meta.NG2019.txt.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/Fetal_Effect_European_meta_NG2019.txt.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/Maternal_BW_European_meta.NG2019.txt.sumstats.gz"
   )
   trait_names <- c(
     "PGF_PGM",
@@ -152,7 +163,11 @@ if (argv[[1]] == "PGC") {
     "FETAL_PREECLAMPSIA",
     "MATERNAL_PREECLAMPSIA",
     "UKBB_PREECLAMPSIA",
-    "Type 1 Diabetes"
+    "Type 1 Diabetes",
+    "EGG_BIRTH_LENGTH",
+    "EGG_BIRTH_WEIGHT_FETAL",
+    "EGG_BIRTH_WEIGHT_FETAL_EFFECT",
+    "EGG_BIRTH_WEIGHT_MATERNAL"
   )
   sample_prev <- c(
     NA,
@@ -172,7 +187,11 @@ if (argv[[1]] == "PGC") {
     0.00862,
     0.5,
     0.0108,
-    0.0364
+    0.0364,
+    NA,
+    NA,
+    NA,
+    NA
   )
 } else if (argv[[1]] == "male") {
   marginal_bonf <- fread("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/male_mcpg_bonf.txt.gz", key = "SNP")[p < 0.05]
@@ -296,7 +315,7 @@ if (argv[[1]] == "PGC") {
 }
 result <- list()
 i <- as.numeric(argv[[2]])
-if (file.exists(glue("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/{trait_names[i]}_colocalization.txt"))) {
+if (file.exists(glue("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/{trait_names[i]}_{which_sex}colocalization.txt"))) {
   quit()
 }
 
@@ -332,7 +351,7 @@ if (length(eligible_cpg) > 0) {
 
   fwrite(
     result,
-    glue("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/{trait_names[i]}_colocalization.txt"),
+    glue("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/{trait_names[i]}_{which_sex}colocalization.txt"),
     quote = F,
     sep = "\t",
     row.names = F
