@@ -57,7 +57,7 @@ fhet_data <- fread(paste0(BASE_DIR,"raw_data.geno.maf.mind.sex_check.het"))
 fhet_data %>%
     left_join(clst,by=c("IID"="V2")) %>%
     mutate(Self.declared.race=V3) %>%
-    ggplot(aes(F,fill=Self.declared.race)) + geom_histogram(bins=30)
+    ggplot(aes(F,fill=Self.declared.race)) + geom_histogram(bins=30) + theme_minimal()
 ```
 
 ## IBD Analysis
@@ -73,7 +73,7 @@ snakemake --configfile config.yaml -j4 genotype_qc/raw_data.geno.maf.mind.sex_ch
 ```{r}
 system(sprintf("gunzip %s ",paste0(BASE_DIR,"raw_data.genome.gz")))
 ibd_report <- fread(paste0(BASE_DIR,"raw_data.genome"))
-ggplot(ibd_report, aes(PI_HAT)) + geom_histogram(bins=100)
+ggplot(ibd_report, aes(PI_HAT)) + geom_histogram(bins=100) + theme_minimal()
 ibd_report[PI_HAT > 0.2]
 ```
 
@@ -96,14 +96,16 @@ plot_pcs <- function(dat,pc_col1,pc_col2,pc,what){
       ggplot(aes_string(pc_col1,pc_col2,color="Self.declared.race")) +
         geom_point() +
         labs(x=sprintf("PC%d",pc),y=sprintf("PC%d",pc+1)) +
-        ggtitle("PCA Placental Regulation")
+        ggtitle("PCA Placental Regulation")+
+        theme_minimal()
     p2 <- dat %>%
       inner_join(metadata,by = c("V2"="SUBJECT_ID")) %>%
       mutate(Self.declared.race= as.factor(Self.declared.race)) %>%
       ggplot(aes_string(pc_col1,"Gestational.Age.at.Delivery",color="Self.declared.race")) +
         geom_point() +
         labs(x=sprintf("PC%d",pc)) +
-        ggtitle("PCA Placental Regulation vs. Age")
+        ggtitle("PCA Placental Regulation vs. Age") +
+        theme_minimal()
     if(what == "age"){
         print(p2)
     }else{
@@ -272,7 +274,7 @@ cd /scratch/st-dennisjk-1/wcasazza/delahaye_QC/placenta_regulatory_landscape/Roo
 snakemake --configfile config.yaml -j16 genotype_qc/all_imputed_r2_30_rsid.vcf.gz
 ```
 
-![](/scratch/st-dennisjk-1/wcasazza/delahaye_QC/placenta_regulatory_landscape/RootStudyConsentSet_phs001717.PlacentalRegulation.v1.p1.c1.HMB-IRB-PUB-COL-MDS/genotype_qc/info_plot_r2_30.png)
+<!-- ![](/scratch/st-dennisjk-1/wcasazza/delahaye_QC/placenta_regulatory_landscape/RootStudyConsentSet_phs001717.PlacentalRegulation.v1.p1.c1.HMB-IRB-PUB-COL-MDS/genotype_qc/info_plot_r2_30.png) -->
 
 ## MAF matching
 ```{bash}
@@ -292,18 +294,20 @@ ggplot(merged_freq, aes(ALT_FREQS.x,ALT_FREQS.y)) + geom_bin2d()
 ## Batch association
 ## check batch association
 ```{r}
-read.delim("TERRE_QC/all_imputed_r2_30_rsid.sample",sep="") %>% left_join(metadata,by = c("ID_1"="FID","ID_2"="IID")) %>% filter(ID_1 != 0) %>% mutate(PD=status) %>% select(PD) %>% write_delim("TERRE_QC/imputed_sample_batches.txt")
+read.delim(paste0(BASE_DIR,"all_imputed_r2_30_rsid.sample"),sep =" ") %>%left_join(metadata,by = c("ID_1"="SUBJECT_ID")) %>% filter(ID_1 != 0) %>% write_delim(paste0(BASE_DIR,"imputed_sample_batches.txt"))
 ```
 
 ```{bash}
 source /home/wcasazza/miniconda3/bin/activate
 conda activate snakemake
-snakemake --configfile config.yaml -j20 TERRE_QC/raw_data.imputed.r2_30.maf_mismatch.batch.gen
+cd /scratch/st-dennisjk-1/wcasazza/delahaye_QC/placenta_regulatory_landscape/RootStudyConsentSet_phs001717.PlacentalRegulation.v1.p1.c1.HMB-IRB-PUB-COL-MDS/
+
+snakemake --configfile config.yaml -j20 genotype_qc/raw_data.imputed.r2_30.maf_mismatch.batch.gen
 ```
 ```{r}
 library(qqman)
 library(data.table)
-reg_results <- fread("TERRE_QC/imputed_dosage_batch_1.PD1.glm.logistic.hybrid")
+reg_results <- fread(paste0(BASE_DIR,"imputed_dosage_batch_1.PD1.glm.logistic.hybrid"))
 qq(reg_results$P)
 manhattan(reg_results)
 ```
