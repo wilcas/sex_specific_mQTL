@@ -89,24 +89,23 @@ snakemake --configfile config.yaml -j4 genotype_qc/raw_data.1kg_pca.pcs
 
 ```{r}
 pcs <- fread(paste0(BASE_DIR,"raw_data.geno.maf.mind.sex_check.het_filter.ibd_filter.eigenvec"))
-plot_pcs <- function(dat,pc_col1,pc_col2,pc,what){
+plot_pcs <- function(dat,pc_col1,pc_col2,pc,what,color="Self.declared.race"){
     p1 <- dat %>%
       inner_join(metadata,by = c("V2"="SUBJECT_ID")) %>%
       mutate(Self.declared.race= as.factor(Self.declared.race)) %>%
-      ggplot(aes_string(pc_col1,pc_col2,color="Self.declared.race")) +
+      ggplot(aes_string(pc_col1,pc_col2,color=color)) +
         geom_point() +
         labs(x=sprintf("PC%d",pc),y=sprintf("PC%d",pc+1)) +
-        ggtitle("PCA Placental Regulation")+
         theme_minimal()
     p2 <- dat %>%
       inner_join(metadata,by = c("V2"="SUBJECT_ID")) %>%
       mutate(Self.declared.race= as.factor(Self.declared.race)) %>%
-      ggplot(aes_string(pc_col1,"Gestational.Age.at.Delivery",color="Self.declared.race")) +
+      ggplot(aes_string(pc_col1,"Gestational.Age.at.Delivery",color=color)) +
         geom_point() +
         labs(x=sprintf("PC%d",pc)) +
         ggtitle("PCA Placental Regulation vs. Age") +
         theme_minimal()
-    if(what == "age"){
+    if(what != ""){
         print(p2)
     }else{
         print(p1)
@@ -216,6 +215,19 @@ graf_pop_dt <- fread("/scratch/st-dennisjk-1/wcasazza/delahaye_QC/graf_pop_resul
 initial_clst %>% mutate(graf_pop = assign_ancestry(graf_pop_dt)) %>% left_join(assigned_ancestry,by=c("V1","V2")) %>% filter(graf_pop != "") %>% dplyr::select(V1,V2,graf_pop)%>% write_delim(paste0(BASE_DIR,"raw_data_assigned_ancestry.clst"), quote=F, col_names = F)
 initial_clst %>% mutate(graf_pop = assign_ancestry(graf_pop_dt)) %>% group_by(graf_pop)
 ```
+
+```{r}
+predicted_ancestry <- fread(paste0(BASE_DIR,"raw_data_assigned_ancestry.clst")) %>% mutate(predicted_ancestry=V3) %>% select(-V3)
+pcs_predicted_ancestry <- merge(pcs,predicted_ancestry,by=c("V1","V2")) 
+plot_pcs(pcs_predicted_ancestry,"V3","V4",1,"","predicted_ancestry")
+plot_pcs(pcs_predicted_ancestry,"V4","V5",2,"","predicted_ancestry")
+plot_pcs(pcs_predicted_ancestry,"V5","V6",3,"","predicted_ancestry")
+plot_pcs(pcs_predicted_ancestry,"V6","V7",4,"","predicted_ancestry")
+plot_pcs(pcs_predicted_ancestry,"V7","V8",5,"","predicted_ancestry")
+predicted_ancestry_meta <- merge(metadata%>% rename(maternal_ethnicity=Self.declared.race),predicted_ancestry,by.x="SUBJECT_ID",by.y="V2")
+table(predicted_ancestry_meta[,c("predicted_ancestry","maternal_ethnicity")]) %>% knitr::kable()
+```
+
 ```{bash}
 source /home/wcasazza/miniconda3/bin/activate
 conda activate snakemake
