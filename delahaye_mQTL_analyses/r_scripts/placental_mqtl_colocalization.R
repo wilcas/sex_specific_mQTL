@@ -6,14 +6,13 @@ library(parallel)
 library(glue)
 argv <- commandArgs(trailingOnly = TRUE)
 which_sex <- argv[[3]]
-if (which_sex == "") {
-  marginal_bonf <- fread("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/marginal_mcpg_bonf.txt.gz", key = "SNP")[p < 0.05]
-} else if (which_sex == "male_mqtl") {
+if (which_sex == "male_mqtl") {
   marginal_bonf <- fread("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/male_mcpg_bonf.txt.gz", key = "SNP")[p < 0.05]
 } else if (which_sex == "female_mqtl") {
   marginal_bonf <- fread("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/female_mcpg_bonf.txt.gz", key = "SNP")[p < 0.05]
+}else{
+  marginal_bonf <- fread("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/marginal_mcpg_bonf.txt.gz", key = "SNP")[p < 0.05]
 }
-
 rds <- snp_readBed2("/arc/project/st-dennisjk-1/shared/data/1000G_EUR_ldsc_data/1000G_EUR_Phase3_plink/1000G.EUR.QC.ALL.bed", backingfile = tempfile())
 
 reference <- snp_attach(rds)
