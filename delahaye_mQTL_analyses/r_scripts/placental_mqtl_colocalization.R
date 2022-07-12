@@ -143,7 +143,10 @@ if (argv[[1]] == "PGC") {
     "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/EGG-GWAS-BL.txt.sumstats.gz",
     "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/Fetal_BW_European_meta.NG2019.txt.sumstats.gz",
     "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/Fetal_Effect_European_meta_NG2019.txt.sumstats.gz",
-    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/Maternal_BW_European_meta.NG2019.txt.sumstats.gz"
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/Maternal_BW_European_meta.NG2019.txt.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/hayfever_eczema_irnt.gwas.imputed_v3.both_sexes.tsv.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/hayfever_eczema_raw.gwas.imputed_v3.both_sexes.tsv.sumstats.gz"
+
   )
   trait_names <- c(
     "PGF_PGM",
@@ -167,7 +170,9 @@ if (argv[[1]] == "PGC") {
     "EGG_BIRTH_LENGTH",
     "EGG_BIRTH_WEIGHT_FETAL",
     "EGG_BIRTH_WEIGHT_FETAL_EFFECT",
-    "EGG_BIRTH_WEIGHT_MATERNAL"
+    "EGG_BIRTH_WEIGHT_MATERNAL",
+    "HAY_FEVER_ECZEMA(irnt)",
+    "HAY_FEVER_ECZEMA(raw)"
   )
   sample_prev <- c(
     NA,
@@ -188,6 +193,8 @@ if (argv[[1]] == "PGC") {
     0.5,
     0.0108,
     0.0364,
+    NA,
+    NA,
     NA,
     NA,
     NA,
@@ -212,7 +219,9 @@ if (argv[[1]] == "PGC") {
     "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/pts_all_freeze2_males.results.sumstats.gz",
     "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/meta_STDERR_scz_eur_auto_M1_08_gcOFF_pgc.txt.gz.sumstats.gz",
     "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/ukbb_anxiety.gwas.imputed_v3.male.tsv.gz.fixed.sumstats.gz",
-    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/NEW_META_PGC_iPSYCH_ASD_males.sumstats.gz"
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/NEW_META_PGC_iPSYCH_ASD_males.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/hayfever_eczema_irnt.gwas.imputed_v3.male.tsv.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/hayfever_eczema_raw.gwas.imputed_v3.male.tsv.sumstats.gz"
   )
   trait_names <- c(
     "AGE_ASTHMA_MALE(irnt)",
@@ -230,7 +239,9 @@ if (argv[[1]] == "PGC") {
     "PTSD_MALE",
     "SCZ_MALE",
     "UKBB_ANXIETY_MALE",
-    "ASD_MALE"
+    "ASD_MALE",
+    "HAY_FEVER_ECZEMA_MALE(irnt)",
+    "HAY_FEVER_ECZEMA_MALE(norm)"
   )
   sample_prev <- c(
     NA,
@@ -248,7 +259,9 @@ if (argv[[1]] == "PGC") {
     0.127,
     0.517,
     0.0109,
-    0.482
+    0.482,
+    NA,
+    NA
   )
 } else if (argv[[1]] == "female") {
   marginal_bonf <- fread("/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/female_mcpg_bonf.txt.gz", key = "SNP")[p < 0.05]
@@ -270,7 +283,9 @@ if (argv[[1]] == "PGC") {
     "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/meta_STDERR_scz_eur_auto_F1_08_gcOFF_pgc.txt.gz.sumstats.gz",
     "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/ukbb_anxiety.gwas.imputed_v3.female.tsv.gz.fixed.sumstats.gz",
     "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/NEW_META_PGC_iPSYCH_ASD_females.sumstats.gz",
-    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/mat_all_chrALL_STERR_EU.sumstats.gz"
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/mat_all_chrALL_STERR_EU.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/hayfever_eczema_irnt.gwas.imputed_v3.female.tsv.sumstats.gz",
+    "/scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/hayfever_eczema_raw.gwas.imputed_v3.female.tsv.sumstats.gz"
   )
   trait_names <- c(
     "AGE_ASTHMA_FEMALE(irnt)",
@@ -290,7 +305,9 @@ if (argv[[1]] == "PGC") {
     "SCZ_FEMALE",
     "UKBB_ANXIETY_FEMALE",
     "ASD_FEMALE",
-    "MATERNAL_PREECLAMPSIA_FEMALE"
+    "MATERNAL_PREECLAMPSIA_FEMALE",
+    "HAY_FEVER_ECZEMA_FEMALE(irnt)",
+    "HAY_FEVER_ECZEMA_FEMALE(raw)"
   )
   sample_prev <- c(
     NA,
@@ -310,7 +327,9 @@ if (argv[[1]] == "PGC") {
     0.37,
     0.0162,
     0.236,
-    0.5
+    0.5,
+    NA,
+    NA
   )
 }
 result <- list()
