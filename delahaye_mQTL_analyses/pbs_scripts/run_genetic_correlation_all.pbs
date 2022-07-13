@@ -24,11 +24,10 @@ merge () {
     python z_to_p.py $f
     gzip -f ${f}.fixed
 
-    mv ${f/.sumstats.gz/.merged.sumstats.gz}.sumstats.gz ${f/.sumstats.gz/.merged.sumstats.gz}
     /project/st-dennisjk-1/software/ldsc/munge_sumstats.py --sumstats ${f}.fixed.gz \
       --merge-alleles /scratch/st-dennisjk-1/wcasazza/w_hm3.snplist \
       --chunksize 500000\
-      --out ${f/.sumstats.gz/.merged}
+      --out ${f/.sumstats.gz.fixed.gz/.merged}
   fi
 }
 export -f merge
