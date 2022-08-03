@@ -1,6 +1,6 @@
 # Sex-dependent placental mQTL provide insight into the prenatal origins of childhood-onset traits and diseases
 
-Code and notebooks corresponding to analysis done in the above titled publication [^1].
+Code and notebooks corresponding to analysis done in the above titled publication [^1]. mQTL summary statistics and related annotations can be found on this [Open Science Framework site](https://osf.io/9r4wf/). 
 
 ## Directory structure
 - [NICHD quality control for DNA methylation and genotyping](./NICHD_all_QC)
