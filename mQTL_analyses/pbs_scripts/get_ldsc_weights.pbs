@@ -1,0 +1,16 @@
+#!/bin/bash
+#PBS -A st-dennisjk-1
+#PBS -J 1-22
+#PBS -l walltime=20:00:00,select=1:ncpus=16:mem=64gb
+#PBS -m be
+#PBS -M willcasazza@gmail.com
+################################################################################
+
+source /home/wcasazza/miniconda3/bin/activate
+conda activate ldsc
+
+ldsc() {
+	/arc/project/st-dennisjk-1/software/ldsc/ldsc.py --l2 --bfile /arc/project/st-dennisjk-1/shared/data/1000G_EUR_ldsc_data/1000G_EUR_Phase3_plink/1000G.EUR.QC.${1} --ld-wind-cm 1 --extract /arc/project/st-dennisjk-1/shared/data/1000G_EUR_ldsc_data/hapmap3_snps/hm.${1}.snp --out /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/weights_hm3/EUR_weights.${1}
+}
+
+ldsc $PBS_ARRAY_INDEX

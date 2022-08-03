@@ -1,0 +1,26 @@
+#!/bin/bash
+#PBS -A st-dennisjk-1
+#PBS -J 1-22
+#PBS -j oe
+#PBS -l walltime=20:00:00,select=1:ncpus=16:mem=64gb
+#PBS -m be
+#PBS -M willcasazza@gmail.com
+################################################################################
+
+source /home/wcasazza/miniconda3/bin/activate
+conda activate ldsc
+module load parallel
+
+cd /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/
+CHR=${PBS_ARRAY_INDEX}
+mkdir baseline_EUR_annot_files/chr${CHR}
+
+make_annot() {
+	f=${1}
+	name=$(basename ${f})
+	/arc/project/st-dennisjk-1/software/ldsc/make_annot.py --bed-file $f --bimfile /arc/project/st-dennisjk-1/shared/data/1000G_EUR_ldsc_data/1000G_EUR_Phase3_plink/1000G.EUR.QC.${CHR}.bim \
+		--annot-file baseline_EUR_annot_files/chr${CHR}/${name%.*}.annot
+}
+export CHR
+export -f make_annot
+parallel make_annot ::: bed/*.bed

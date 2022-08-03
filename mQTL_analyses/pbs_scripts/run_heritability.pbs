@@ -1,0 +1,40 @@
+#!/bin/bash
+#PBS -A st-dennisjk-1
+#PBS -l walltime=05:00:00,select=1:ncpus=4:mem=64gb
+#PBS -m a
+# N Jobs is number of GWASxnumber of mQTL setsxnumber of annotations
+#PBS -J 0-54
+#PBS -j oe
+#PBS -M willcasazza@gmail.com
+################################################################################
+GWAS=(adhd_jul2017 CAD_META rall_SCZ ukbb_preeclampsia_female AD_jansen_2019 IBS_Bonfiglio ukbb_preeclampsia_both_sexes iPSYCH-PGC_ASD_Nov2017 pancancer_2020_lung)
+MQTL=(marginal sex_interaction)
+ANNOTATION=(all_cis bin_CPP maxCPP)
+
+COMBN=()
+for a in ${GWAS[@]}; do
+	for b in ${MQTL[@]}; do
+		for c in ${ANNOTATION[@]}; do
+			COMBN+=("${a} ${b} ${c}")
+		done
+	done
+done
+read -a CUR <<<"${COMBN[$PBS_ARRAY_INDEX]}"
+CUR_GWAS=${CUR[0]}
+CUR_MQTL=${CUR[1]}
+CUR_ANNOTATION=${CUR[2]}
+
+source /home/wcasazza/miniconda3/bin/activate
+conda activate ldsc
+ldsc() {
+	if [ ! -f "/scratch/st-dennisjk-1/wcasazza/delahaye_QC/ldsc_results/${2}_${3}_${1}.results" ]; then
+		/arc/project/st-dennisjk-1/software/ldsc/ldsc.py --h2 /scratch/st-dennisjk-1/wcasazza/tmp_GWAS/formatted_sumstats/${1}.sumstats.gz \
+			--ref-ld-chr /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_annotations/${2}_${3}.,/scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/baseline_annot_files/fixed_baselineLD. --w-ld-chr /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/weights_1kg_common/1kg_cosmopolitan.common. --frqfile-chr /arc/project/st-dennisjk-1/shared/data/1000G_phase3_by_chr/plink/mapped_maf01_chr --out /scratch/st-dennisjk-1/wcasazza/delahaye_QC/ldsc_results/${2}_${3}_${1} \
+			--overlap-annot \
+			--print-coefficients \
+			--print-delete-vals
+
+	fi
+}
+
+ldsc ${CUR_GWAS} ${CUR_MQTL} ${CUR_ANNOTATION}

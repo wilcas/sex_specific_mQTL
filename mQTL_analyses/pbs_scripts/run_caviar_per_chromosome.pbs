@@ -1,0 +1,67 @@
+#!/bin/bash
+
+#PBS -l walltime=20:00:00,select=1:ncpus=16:mem=64gb
+#PBS -N caviar
+#PBS -A st-dennisjk-1
+#PBS -j oe
+#PBS -J 1-23
+################################################################################
+set -e -x
+# Load software environment
+
+module load gsl
+module load netlib-lapack
+module load netlib-xblas
+module load parallel
+module load r
+# Set global variables
+PLINK="/arc/project/st-dennisjk-1/software/plink1.9/plink"
+CAVIAR="/arc/project/st-dennisjk-1/software/caviar/CAVIAR-C++/CAVIAR"
+if [[ $PBS_ARRAY_INDEX -eq 23 ]]; then
+	CHR="X"
+else
+	CHR="$PBS_ARRAY_INDEX"
+fi
+
+run_caviar() {
+	f="$1"
+	if [[ ! -f ${f%.*}.out_post ]]; then
+
+		$PLINK --bfile /arc/project/st-dennisjk-1/shared/data/1000G_phase3_by_chr/plink/chr${CHR} \
+			--extract ${f} \
+			--r square --out ${f%.*}
+
+		$CAVIAR -o ${f%.*}.out \
+			-l ${f%.*}.ld \
+			-z ${f} \
+			-r 0.95 \
+			-c 2 -f 0
+		rm ${f%.*}.{ld,out_set,log,out.log,nosex}
+		rm ${f}
+	fi
+}
+
+#if [[ -f ${FILE_PREFIX}_all_cis.${CHR}.annot.gzi ]] && [[ -f ${FILE_PREFIX}_maxCPP.${CHR}.annot.gz ]] || [[ -f  ${FILE_PREFIX}_bin_CPP.${CHR}.annot.gz ]]; then
+#
+#  exit
+#fi
+
+
+mkdir -p ${Z_DIR}/chr${CHR}/
+# Execute Rscript prep_caviar_z.R ${CHR} ${MQTLS} ${Z_DIR}
+Rscript /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses/r_scripts/prep_caviar_z.R ${CHR} ${MQTLS} ${Z_DIR}
+
+export -f run_caviar
+export PLINK
+export CAVIAR
+export CHR
+
+find ${Z_DIR}/chr${CHR}/ -maxdepth 1 | grep \.z | parallel run_caviar &>/dev/null
+
+Rscript /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses/r_scripts/merge_caviar.R "${CHR}" "${Z_DIR}" "${FILE_PREFIX}"
+
+Rscript /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses/r_scripts/match_annotation_baseline.R "${FILE_PREFIX}.%d.annot.gz" "${FILE_PREFIX}_%s.%d.annot.gz" "${CHR}"
+
+Rscript /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses/r_scripts/make_cis_annotation.R ${MQTLS} "${FILE_PREFIX}.%d.annot.gz" "${FILE_PREFIX}_all_cis" "${CHR}"
+
+Rscript /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/delahaye_mQTL_analyses/r_scripts/match_annotation_baseline.R "${FILE_PREFIX}_all_cis.%d.annot.gz" "${FILE_PREFIX}_%s.%d.annot.gz" "${CHR}"

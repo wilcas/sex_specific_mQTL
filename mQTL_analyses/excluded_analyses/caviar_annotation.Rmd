@@ -1,0 +1,74 @@
+---
+title: "CAVIAR ANNOTATION"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(data.table)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Overview
+The ultimate goal here is to generate an annotation from mQTLs in delahaye. The required components must be generated for each CpG site:
+1. LD matrix for all tested SNPs
+2. SNP Z-score file
+
+These components will then be used to get a continuous value for all SNPs tested at each CpG. We'll then take the the best (Maximum?) Value for each SNP and use this to define a continuous annotation to be used in LD score regression with a QTL GWAS. The question being answered is whether or not GWAS SNPs are more enriched in sex-specific mQTLs vs general mQTLs in placenta.
+
+## LD matrix for tested SNPs
+1. Generate SNP sets for each CpG
+2. Use plink to calculate LD for these sets
+```{r}
+all_mQTLs <- fread("matrix_eqtl_data/cis_mQTL_9_methy_PC_all.txt")
+```
+### SNP Sets and Z scores
+```{r}
+probe_pos <- fread("matrix_eqtl_data/probe_pos.txt")
+kg_snps <- fread("/arc/project/st-dennisjk-1/shared/data/1000G_phase3_info/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz", skip = "#CHROM", drop = c("QUAL", "FILTER", "INFO"))
+mQTL_in_1kg <- all_mQTLs[SNP %chin% kg_snps[`#CHROM` == "22"]$ID]
+for (cpg in unique(mQTL_in_1kg$gene)[1:10]) {
+  chr <- probe_pos[geneid == cpg]$chr
+  fwrite(
+    mQTL_in_1kg[gene == cpg, .(SNP, Z = `t-stat`)],
+    sprintf("caviar_files/%s/%s.z", chr, cpg),
+    sep = "\t",
+    col.names = FALSE,
+    quote = FALSE
+  )
+}
+```
+
+### Compute LD and run CAVIAR
+```{bash}
+PLINK="/arc/project/st-dennisjk-1/software/plink1.9/plink"
+CAVIAR="/arc/project/st-dennisjk-1/software/caviar/CAVIAR-C++/CAVIAR"
+for i in 22; do
+  for f in caviar_files/chr${i}/*.z;do
+    time $PLINK --bfile /arc/project/st-dennisjk-1/shared/data/1000G_phase3_by_chr/plink/chr${i}\
+      --allow-no-sex\
+      --extract ${f}\
+      --r square\
+      --out ${f%.*}
+
+    time $CAVIAR -o ${f%.*}.out \
+      -l ${f%.*}.ld \
+      -z ${f} \
+      -r 0.95 \
+      -c 2
+    rm ${f%.*}.ld
+  done
+done
+
+```
+### Caviar dbugging
+Certain probes aren't yielding LD files, so it's either something with z score write-out or plink that's getting errors:
+
+```{bash}
+cg03988279.ld
+```
+
+## Merge data
+There's a limit of 1 million files on Sockeye, so I need to make sure I merge and delete data as it's generated:
+```{r}
+
+```

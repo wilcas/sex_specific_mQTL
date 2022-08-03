@@ -1,0 +1,39 @@
+#!/bin/bash
+#PBS -A st-dennisjk-1
+#PBS -l walltime=05:00:00,select=1:ncpus=4:mem=64gb
+# N Jobs is number of GWASxnumber of mQTL setsxnumber of annotations
+#PBS -J 0-419
+#PBS -j oe
+################################################################################
+GWAS=( adhd_jul2017 anxiety.meta.full.cc.tbl anxiety.meta.full.fs.tbl AUDIT_UKB_2018_AJP.txt Cannabis_ICC_23andmetop_UKB_het.txt iPSYCH-PGC_ASD_Nov2017 meta_STDERR_bip_eur_auto_F1_08_gcOFF_pgc.txt.gz meta_STDERR_bip_eur_auto_M1_08_gcOFF_pgc.txt.gz meta_STDERR_mdd_eur_auto_F1_08_gcOFF_pgc.txt meta_STDERR_mdd_eur_auto_M1_08_gcOFF_pgc.txt meta_STDERR_rmdd_eur_auto_F1_08_gcOFF_pgc.txt.gz meta_STDERR_rmdd_eur_auto_M1_08_gcOFF_pgc.txt.gz meta_STDERR_scz_eur_auto_F1_08_gcOFF_pgc.txt.gz meta_STDERR_scz_eur_auto_M1_08_gcOFF_pgc.txt.gz NEW_META_PGC_iPSYCH_ASD_females NEW_META_PGC_iPSYCH_ASD_males ocd_aug2017 OCD_meta_female_auto_072416.gz OCD_meta_male_auto_072416.gz PGC3_SCZ_wave3_public.v2.tsv pgc_adhd_females pgc_adhd_males pgc_alcdep.afr_discovery.aug2018_release.txt pgc_alcdep.afr_unrelated.aug2018_release.txt pgc_alcdep.afr_unrel_genotyped.aug2018_release.txt pgc_alcdep.discovery.aug2018_release.txt pgc_alcdep.eur_discovery.aug2018_release.txt pgc_alcdep.eur_unrelated.aug2018_release.txt pgc_alcdep.eur_unrel_genotyped.aug2018_release.txt pgc_alcdep.trans_fe_unrel_geno.aug2018_release.txt pgcAN2.2019-07.vcf.tsv pgc_bip_2018 pgc.cross.full.2013-03.txt PGC_UKB_depression_genome-wide.txt pts_all_freeze2_females.results pts_all_freeze2_males.results pts_all_freeze2_overall.results tag.cpd.tbl TS_Oct2018 ukbb_anxiety.gwas.imputed_v3.both_sexes.tsv.gz.fixed ukbb_anxiety.gwas.imputed_v3.female.tsv.gz.fixed ukbb_anxiety.gwas.imputed_v3.male.tsv.gz.fixed )
+
+MQTL=( marginal_meta male_meta female_meta male_specific_meta female_specific_meta ) # male_specific_meta female_specific_meta  sex_interaction_meta marginal_meta male_meta cord_mqtl female_meta)
+ANNOTATION=( Cred95FDR maxCPPFDR ) #bin_CPP_her ) # maxCPP_her ) #all_cis bin_CPP maxCPP)
+
+COMBN=()
+for a in ${GWAS[@]}; do
+	for b in ${MQTL[@]}; do
+		for c in ${ANNOTATION[@]}; do
+			COMBN+=("${a} ${b} ${c}")
+		done
+	done
+done
+echo "${#COMBN[@]}"
+read -a CUR <<< "${COMBN[$PBS_ARRAY_INDEX]}"
+CUR_GWAS=${CUR[0]}
+CUR_MQTL=${CUR[1]}
+CUR_ANNOTATION=${CUR[2]}
+source /home/wcasazza/miniconda3/bin/activate
+conda activate ldsc
+ldsc() {
+#	if [ ! -f "/scratch/st-dennisjk-1/wcasazza/delahaye_QC/ldsc_meta_EUR_pgc_original_baseline/${1}_${3}_${1}.results" ]; then
+		/arc/project/st-dennisjk-1/software/ldsc/ldsc.py --h2 /scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/${1}.sumstats.gz \
+			--ref-ld-chr /scratch/st-dennisjk-1/wcasazza/1000G_phase3_ldsc/single_delahaye_annotations/${2}_${3}.,/scratch/st-dennisjk-1/wcasazza/1000G_v2.2_baseline/baselineLD. --w-ld-chr /scratch/st-dennisjk-1/wcasazza/1000G_Phase3_weights_hm3_no_MHC/weights.hm3_noMHC. --frqfile-chr /scratch/st-dennisjk-1/wcasazza/1000G_Phase3_frq/1000G.EUR.QC. --out /scratch/st-dennisjk-1/wcasazza/delahaye_QC/ldsc_meta_EUR_pgc_original_baseline/${2}_${3}_${1} \
+			--overlap-annot \
+			--print-coefficients \
+			--print-delete-vals
+
+#	fi
+}
+
+ldsc ${CUR_GWAS} ${CUR_MQTL} ${CUR_ANNOTATION}

@@ -1,0 +1,59 @@
+#!/bin/bash
+#PBS -A st-dennisjk-1
+#PBS -l walltime=05:00:00,select=1:ncpus=32:mem=120gb
+################################################################################
+NEONATAL_GWAS=( age_asthma_irnt.gwas.imputed_v3.both_sexes.tsv age_asthma_irnt.gwas.imputed_v3.female.tsv age_asthma_irnt.gwas.imputed_v3.male.tsv age_asthma_raw.gwas.imputed_v3.both_sexes.tsv age_asthma_raw.gwas.imputed_v3.female.tsv age_asthma_raw.gwas.imputed_v3.male.tsv age_diabetes_irnt.gwas.imputed_v3.both_sexes.tsv age_diabetes_irnt.gwas.imputed_v3.female.tsv age_diabetes_irnt.gwas.imputed_v3.male.tsv age_diabetes_raw.gwas.imputed_v3.both_sexes.tsv age_diabetes_raw.gwas.imputed_v3.female.tsv age_diabetes_raw.gwas.imputed_v3.male.tsv age_hay_fever_irnt.gwas.imputed_v3.both_sexes.tsv age_hay_fever_irnt.gwas.imputed_v3.female.tsv age_hay_fever_irnt.gwas.imputed_v3.male.tsv age_hay_fever_raw.gwas.imputed_v3.both_sexes.tsv age_hay_fever_raw.gwas.imputed_v3.female.tsv age_hay_fever_raw.gwas.imputed_v3.male.tsv CHILD_ONSET_ASTHMA.20180501.allchr.assoc.GC EGG_BMI_HapMap_DISCOVERY.txt EGG_HC_DISCOVERY.v2.txt EGG_Obesity_Meta_Analysis_1.txt EGG_TANNER_females.v2.txt EGG_TANNER_males_and_females_combined.v2.txt EGG_TANNER_males.v2.txt EGG-TotalGWG-Offspring.txt Pubertal_growth_10F_12M_combined.txt Pubertal_growth_10F.txt Pubertal_growth_12M.txt Pubertal_growth_PGF_PGM_combined.txt Pubertal_growth_PGF.txt Pubertal_growth_PGM.txt Pubertal_growth_PTF_PTM_combined.txt Pubertal_growth_PTF.txt Pubertal_growth_PTM.txt ukbb_preeclampsia.gwas.imputed_v3.female.tsv interpreggen.fetal.pe.meta.release.31jan2017 mat_all_chrALL_STERR_EU ukbb_type_1_diabetes.gwas.imputed_v3.both_sexes ukbb_type_1_diabetes.gwas.imputed_v3.female T1D.UCSC_META EGG-GWAS-BL.txt Fetal_BW_European_meta.NG2019.txt hayfever_eczema_irnt.gwas.imputed_v3.both_sexes.tsv hayfever_eczema_irnt.gwas.imputed_v3.female.tsv hayfever_eczema_irnt.gwas.imputed_v3.male.tsv hayfever_eczema_raw.gwas.imputed_v3.both_sexes.tsv hayfever_eczema_raw.gwas.imputed_v3.female.tsv hayfever_eczema_raw.gwas.imputed_v3.male.tsv  )
+
+PGC_GWAS=( adhd_jul2017 anxiety.meta.full.cc.tbl anxiety.meta.full.fs.tbl AUDIT_UKB_2018_AJP.txt Cannabis_ICC_23andmetop_UKB_het.txt iPSYCH-PGC_ASD_Nov2017 meta_STDERR_bip_eur_auto_F1_08_gcOFF_pgc.txt.gz meta_STDERR_bip_eur_auto_M1_08_gcOFF_pgc.txt.gz meta_STDERR_mdd_eur_auto_F1_08_gcOFF_pgc.txt meta_STDERR_mdd_eur_auto_M1_08_gcOFF_pgc.txt meta_STDERR_rmdd_eur_auto_F1_08_gcOFF_pgc.txt.gz meta_STDERR_rmdd_eur_auto_M1_08_gcOFF_pgc.txt.gz meta_STDERR_scz_eur_auto_F1_08_gcOFF_pgc.txt.gz meta_STDERR_scz_eur_auto_M1_08_gcOFF_pgc.txt.gz NEW_META_PGC_iPSYCH_ASD_females NEW_META_PGC_iPSYCH_ASD_males ocd_aug2017 OCD_meta_female_auto_072416.gz OCD_meta_male_auto_072416.gz PGC3_SCZ_wave3_public.v2.tsv pgc_adhd_females pgc_adhd_males pgc_alcdep.eur_unrelated.aug2018_release.txt pgc_alcdep.eur_unrel_genotyped.aug2018_release.txt pgcAN2.2019-07.vcf.tsv pgc_bip_2018 pgc.cross.full.2013-03.txt PGC_UKB_depression_genome-wide.txt pts_all_freeze2_females.results pts_all_freeze2_males.results pts_all_freeze2_overall.results tag.cpd.tbl TS_Oct2018  )
+
+PGC_GWAS=( "${PGC_GWAS[@]/#//scratch/st-dennisjk-1/wcasazza/tmp_GWAS/pgc_formatted_sumstats/}" )
+NEONATAL_GWAS=( "${NEONATAL_GWAS[@]/#//scratch/st-dennisjk-1/wcasazza/tmp_GWAS/neonatal_gwas/formatted/}" )
+ALL_GWAS=( "${NEONATAL_GWAS[@]}"  "${PGC_GWAS[@]}" )
+
+NEONATAL_GWAS=( "${NEONATAL_GWAS[@]/%/.sumstats.gz}" )
+PGC_GWAS=( "${PGC_GWAS[@]/%/.sumstats.gz}" )
+
+source /home/wcasazza/miniconda3/bin/activate
+conda activate ldsc
+module load parallel
+
+
+merge () {
+  f=${1}
+  if [ ! -f ${f/.sumstats.gz/.merged.sumstats.gz} ]; then
+    python z_to_p.py $f
+    gzip -f ${f}.fixed
+
+    /project/st-dennisjk-1/software/ldsc/munge_sumstats.py --sumstats ${f}.fixed.gz \
+      --merge-alleles /scratch/st-dennisjk-1/wcasazza/w_hm3.snplist \
+      --chunksize 500000\
+      --out ${f/.sumstats.gz.fixed.gz/.merged}
+  fi
+}
+export -f merge
+
+parallel merge {} ::: ${ALL_GWAS[@]}
+
+NEONATAL_GWAS=( "${NEONATAL_GWAS[@]/.sumstats.gz/.merged.sumstats.gz}" )
+NEONATAL_GWAS_STR="${NEONATAL_GWAS[@]}"
+NEONATAL_GWAS_STR=$(echo "${NEONATAL_GWAS_STR//${IFS:0:1}/,}")
+PGC_GWAS=( "${PGC_GWAS[@]/.sumstats.gz/.merged.sumstats.gz}" )
+PGC_GWAS_STR="${PGC_GWAS[@]}"
+PGC_GWAS_STR=$(echo "${PGC_GWAS_STR//${IFS:0:1}/,}")
+
+INPUT_STR="${PGC_GWAS_STR},${NEONATAL_GWAS_STR}"
+echo $INPUT_STR
+compute_corr() {
+  if [ ! -f /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/genetic_correlation.${1/#*\/}.log ]; then
+    /arc/project/st-dennisjk-1/software/ldsc/ldsc.py \
+      --rg ${1}.merged.sumstats.gz,${INPUT_STR} \
+      --ref-ld-chr /scratch/st-dennisjk-1/wcasazza/1000G_Phase3_weights_hm3_no_MHC/\
+      --w-ld-chr /scratch/st-dennisjk-1/wcasazza/1000G_Phase3_weights_hm3_no_MHC/ \
+      --frqfile-chr /scratch/st-dennisjk-1/wcasazza/1000G_Phase3_frq/1000G.EUR.QC. \
+      --out /scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/genetic_correlation.${1/#*\/}
+  fi
+}
+
+export -f compute_corr
+export INPUT_STR
+parallel compute_corr {} ::: ${ALL_GWAS[@]}
