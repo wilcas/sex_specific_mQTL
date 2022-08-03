@@ -8,7 +8,7 @@ Code and notebooks corresponding to analysis done in the above titled publicatio
 - [Analysis code for publication](./mQTL_analyses/)
     - [main results figures and data processing](./mQTL_analyses/main_analyses/)
     - [Supporting R scripts](./mQTL_analyses/r_scripts/)
-    - [Support TORQUE/MOAB scripts, written in bash](./mQTL_analyses/pbs_scripts/)
+    - [Supporting TORQUE/MOAB scripts, written in bash](./mQTL_analyses/pbs_scripts/)
 
 ## Environment file
 All packages used in this project are included in the `environment.yml` file. They can be installed [using anaconda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file)
