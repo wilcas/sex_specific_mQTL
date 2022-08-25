@@ -1,4 +1,4 @@
-# Sex-dependent placental mQTL provide insight into the prenatal origins of childhood-onset traits and diseases
+# Sex-dependent placental mQTL provide insight into the prenatal origins of childhood-onset traits and conditions
 
 Code and notebooks corresponding to analysis done in the above titled publication [^1]. mQTL summary statistics and related annotations can be found on this [Open Science Framework site](https://osf.io/9r4wf/). 
 
