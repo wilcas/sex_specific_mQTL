@@ -15,4 +15,4 @@ All packages used in this project are included in the `environment.yml` file. Th
 
 
 
-[^1] Casazza et al, in preparation.
+[^1]: Casazza et al, in preparation.
