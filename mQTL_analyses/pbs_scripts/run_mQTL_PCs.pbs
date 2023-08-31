@@ -7,13 +7,13 @@
 #PBS -M willcasazza@gmail.com
 cd /scratch/st-dennisjk-1/wcasazza/delahaye_QC/
 run_mqtl_chr() {
-	singularity exec /arc/project/st-dennisjk-1/software/rstudio/rstudio.sif Rscript run_cis_mqtl_75k.R --data_dir="matrix_eqtl_data/" \
-		--SNP_fname="all_imputed_matrixeQTL_chr1.txt" \
+	singularity exec /arc/project/st-dennisjk-1/software/rstudio/rstudio.sif Rscript run_cis_mqtl_75k.R --data_dir="${DATA_DIR}" \
+		--SNP_fname="all_imputed_matrixeQTL_chr21.txt" \
 		--cov_file="mQTL_covar_${1}_methy_PC.txt" \
 		--cis_outfile="cis_all_impute_mQTL_results_${1}_methy_PC_chr21.txt" \
 		--snp_pos="snp_pos_chr1.txt" \
-		--methylation_fname="methylation_matrixeQTL_chr1.txt" \
-		--probe_pos="probe_pos_chr1.txt"
+		--methylation_fname="methylation_matrixeQTL_chr21.txt" \
+		--probe_pos="probe_pos_chr21.txt"
 }
 
 module load parallel

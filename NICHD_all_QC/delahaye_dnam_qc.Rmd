@@ -44,7 +44,7 @@ Often, raw DNAme data on GEO or from Genome Studio is stored in the form of a da
 
 According to *Page 48* of the the [Genome Studio Methylation Module v1.8 User Guide](https://support.illumina.com/content/dam/illumina-support/documents/documentation/software_documentation/genomestudio/genomestudio-2011-1/genomestudio-methylation-v1-8-user-guide-11319130-b.pdf), *Methylated == Signal B == Green*
 
-This data is often stored seperately as a supplementary file in GEO.
+This data is often stored separately as a supplementary file in GEO.
 
 ```{r}
 # read GEO data and separate meth unmeth objects, echo=TRUE}
@@ -74,7 +74,7 @@ colnames(unmeth.1) # 36
 
 meth.1 <- methy_data[, grep(".Signal_B", colnames(methy_data))]
 colnames(meth.1) <- gsub(".Signal_B", "", colnames(meth.1))
-colnames(meth.1) # 36
+# colnames(meth.1)
 
 # sanity check that everything matches
 identical(rownames(meth.1), rownames(unmeth.1))
@@ -214,9 +214,9 @@ dim(betas) # 485110
 ```
 
 ```{r}
-# SNP and XY probes}
+# SNP and XY probes
 
-# SNP probes - already gone (by preprocessNoob)
+# SNP probes
 rs_probes <- grep(pattern = "^rs", x = rownames(betas)) # vector of rs rownames
 length(rs_probes) # 0
 # XY probes
@@ -259,7 +259,7 @@ Chen annotation can be downloaded from the Weksberg lab website: http://www.sick
 Hansen: https://bioconductor.org/packages/release/data/annotation/manuals/IlluminaHumanMethylation450kanno.ilmn12.hg19/man/IlluminaHumanMethylation450kanno.ilmn12.hg19.pdf
 **NOTE** This will NOT be applied since we are interested in the association of SNP and DNA methylation.
 ```{r}
-# polymorphic probes, eval=FALSE}
+# polymorphic probes
 
 # read in chen polymoprhic probes
 Chen <- readxl::read_xlsx("/arc/project/st-dennisjk-1/wcasazza/methylation_QC_resources/48640-polymorphic-CpGs-Illumina450k.xlsx")
@@ -310,17 +310,12 @@ all.equal(rownames(betas), rownames(mset_filt)) # should be TRUE
 
 If I don't have rgset objects available for use with minfi's normalization functions, I would use one of these options. There are definitely other options out there (dasen for example) but tend to be more laborious to code, and are also used less frequently in the literature. Can check out if interested.
 
-##### 4.2.1 minfi::Quantile
-
-The minfi function for quantile normalization is applicable to both rgest and msets. For a description of this method, see Touleimat & Tost, 2012. *This function returns a GenomicRatioSet*. This method relies on a reference distribution of Type I probes that it normalizes the distribution of Type II probes against, so setting the seed is important to ensure the same random distribution of Type I reference probes is selected each time, for reproducible normalization.
-
-https://www.rdocumentation.org/packages/minfi/versions/1.18.4/topics/preprocessQuantile
+##### Functional normalization
 
 ```{r }
-# preprocessquantile}
 
 set.seed(42)
-grset.quantile <- preprocessQuantile(mset_filt, sex = na.omit(recode(as.character(metadata$Gender[match(colnames(mset_filt), metadata$SUBJECT_ID)]), "Male" = "M", "Female" = "F")))
+grset.funnorm <- preprocessFunnorm(mset_filt, sex = na.omit(recode(as.character(metadata$Gender[match(colnames(mset_filt), metadata$SUBJECT_ID)]), "Male" = "M", "Female" = "F")))
 betas.quantile <- getBeta(grset.quantile)
 probeDesign <- data.frame(Type = getProbeType(grset.quantile, withColor = FALSE))
 probeDesign$Name <- rownames(grset.quantile)

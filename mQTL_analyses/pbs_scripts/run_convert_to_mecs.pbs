@@ -16,10 +16,13 @@ DATA="/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data"
 MQTL_SETS=( male female cross-sex sex-dependent )
 MQTL=${MQTL_SETS[$PBS_ARRAY_INDEX]}
 
-# Run meta-analysis
-echo "$DATA/delahaye_${MQTL}" > "$DATA/${MQTL}_besd.list"
+
+# Conversion
+convert_mecs () {
+echo "$DATA/$1_${MQTL}" > "$DATA/${MQTL}_besd.list"
 echo "/scratch/st-dennisjk-1/wcasazza/sex_specific_mQTL/data/richs_${MQTL}" >> "$DATA/${MQTL}_besd.list"
 smr_Linux --besd-flist "$DATA/${MQTL}_besd.list"\
     --mecs\
     --thread-num 32 \
-    --out "${DATA}/delahaye_richs_${MQTL}_mecs"
+    --out "${DATA}/delahaye"
+}
