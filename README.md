@@ -17,4 +17,4 @@ All packages used in this project are included in the `environment.yml` file. Th
 
 
 
-[^1]: Casazza et al, in preparation.
+[^1]: William Casazza, Amy M. Inkster, Giulia F. Del Gobbo, Victor Yuan, Fabien Delahaye, Carmen Marsit, Yongjin P. Park, Wendy P. Robinson, Sara Mostafavi, Jessica K. Dennis. Sex-dependent placental mQTL provide insight into the prenatal origins of childhood onset traits and conditions. *iScience*, 2024. https://doi.org/10.1016/j.isci.2024.109047
